@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Báo cáo tuần — Truyền thông tuyển sinh ĐH Duy Tân</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--red:#C8393F;--ink:#201F22;--muted:#77767B;--line:#E6E4E6;--tint:#FBEAEA;--success:#1E7A4C;}
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:'Inter',sans-serif;color:var(--ink);background:#EFEEF1;}
+  .page{
+    max-width:820px;margin:24px auto;background:#fff;padding:46px 54px;
+    box-shadow:0 10px 40px rgba(32,31,34,.12);border-radius:6px;
+  }
+  .report-head{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid var(--red);padding-bottom:18px;margin-bottom:26px;}
+  .report-head img{height:44px;}
+  .report-head .meta{text-align:right;font-size:12px;color:var(--muted);line-height:1.6;}
+  h1{font-family:'Manrope',sans-serif;font-size:22px;margin:0 0 4px;}
+  .sub{color:var(--muted);font-size:13px;margin:0 0 26px;}
+  h2{font-family:'Manrope',sans-serif;font-size:15px;margin:28px 0 12px;display:flex;align-items:center;gap:8px;}
+  h2::before{content:"";width:5px;height:16px;background:var(--red);border-radius:3px;display:inline-block;}
+  .kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+  .kpi{border:1px solid var(--line);border-radius:10px;padding:14px;text-align:center;}
+  .kpi .v{font-family:'Manrope',sans-serif;font-weight:800;font-size:21px;color:var(--red);}
+  .kpi .l{font-size:10.5px;color:var(--muted);font-weight:600;margin-top:4px;}
+  .insight{background:#FBF6E8;border-left:4px solid #B98A00;border-radius:0 10px 10px 0;padding:13px 16px;font-size:13px;line-height:1.7;color:#5C4A1E;}
+  table{width:100%;border-collapse:collapse;font-size:12.5px;}
+  th{background:#F6F5F6;text-align:left;padding:8px 10px;font-size:11px;letter-spacing:.4px;text-transform:uppercase;color:var(--muted);}
+  td{padding:8px 10px;border-bottom:1px solid var(--line);}
+  .fr{display:flex;align-items:center;gap:10px;margin-bottom:7px;font-size:12px;}
+  .fr .lbl{width:170px;flex-shrink:0;font-weight:600;}
+  .fr .track{flex:1;background:#F0EFF1;border-radius:6px;height:20px;overflow:hidden;}
+  .fr .fill{height:100%;background:linear-gradient(90deg,var(--ink),var(--red));border-radius:6px;}
+  .fr .val{width:90px;text-align:right;font-weight:700;font-family:'Manrope',sans-serif;flex-shrink:0;}
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:24px;}
+  .footer{margin-top:34px;padding-top:14px;border-top:1px solid var(--line);font-size:11px;color:var(--muted);display:flex;justify-content:space-between;}
+  .print-bar{position:fixed;top:14px;right:14px;display:flex;gap:8px;}
+  .print-bar button{
+    border:none;border-radius:10px;padding:11px 18px;font-weight:700;font-size:13px;cursor:pointer;
+    font-family:'Inter',sans-serif;background:var(--red);color:#fff;box-shadow:0 6px 18px rgba(200,57,63,.35);
+  }
+  .loading{text-align:center;padding:80px 0;color:var(--muted);font-size:14px;}
+  @media print{
+    body{background:#fff;}
+    .page{box-shadow:none;margin:0;max-width:none;border-radius:0;padding:20px 6px;}
+    .print-bar{display:none;}
+  }
+</style>
+</head>
+<body>
+<div class="print-bar"><button onclick="window.print()">🖨 In / Lưu PDF</button></div>
+<div class="page" id="page"><div class="loading">Đang tổng hợp số liệu từ hệ thống...</div></div>
+
+<script>
+const API_BASE = window.DTU_API_BASE || "http://localhost:8000/api";
+// Token do Nền tảng quản lý truyền qua hash khi mở trang (chấp nhận được cho bản demo)
+const token = decodeURIComponent((location.hash.match(/token=([^&]+)/) || [])[1] || "");
+
+async function api(path) {
+  const res = await fetch(API_BASE + path, { headers: { "Authorization": "Bearer " + token } });
+  if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || res.status);
+  return res.json();
+}
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+async function build() {
+  try {
+    const [kpi, insight, funnel, bySource, teachers, leads, topics] = await Promise.all([
+      api("/kpi/tong-quan"), api("/kpi/nhan-dinh-tuan"), api("/funnel"),
+      api("/funnel/theo-nguon"), api("/teachers"), api("/chatbot/leads"), api("/chatbot/chu-de-noi-bat"),
+    ]);
+    const now = new Date();
+    const weekAgo = new Date(now.getTime() - 6 * 864e5);
+    const fmt = d => d.toLocaleDateString("vi-VN");
+    const maxF = Math.max(...funnel.map(f => f.value), 1);
+
+    document.getElementById("page").innerHTML = `
+      <div class="report-head">
+        <img src="../assets/logo.png" alt="Đại học Duy Tân">
+        <div class="meta">BÁO CÁO TUẦN — PHÒNG TRUYỀN THÔNG & TUYỂN SINH<br>
+        Kỳ báo cáo: ${fmt(weekAgo)} – ${fmt(now)}<br>Xuất lúc ${now.toLocaleString("vi-VN")}</div>
+      </div>
+      <h1>Hiệu quả truyền thông – marketing số tuyển sinh</h1>
+      <p class="sub">Tổng hợp tự động từ Nền tảng quản lý truyền thông tuyển sinh (dữ liệu thời gian thực).</p>
+
+      <h2>Chỉ số tổng quan</h2>
+      <div class="kpi-row">
+        <div class="kpi"><div class="v">${kpi.tong_luot_tiep_can.toLocaleString("vi-VN")}</div><div class="l">Lượt tiếp cận</div></div>
+        <div class="kpi"><div class="v">${kpi.ty_le_tuong_tac_trung_binh}%</div><div class="l">Tỷ lệ tương tác TB</div></div>
+        <div class="kpi"><div class="v">${kpi.giang_vien_dat_chi_tieu_pct}%</div><div class="l">GV đạt chỉ tiêu 5 bài</div></div>
+        <div class="kpi"><div class="v">${kpi.so_cau_hoi_chatbot.toLocaleString("vi-VN")}</div><div class="l">Câu hỏi chatbot (${kpi.ty_le_tu_dong_tra_loi_pct}% tự động)</div></div>
+      </div>
+
+      <h2>Nhận định AI tuần này</h2>
+      <div class="insight">${esc(insight.nhan_dinh)}</div>
+
+      <h2>Phễu chuyển đổi</h2>
+      ${funnel.map(f => `
+        <div class="fr">
+          <div class="lbl">${esc(f.label)}</div>
+          <div class="track"><div class="fill" style="width:${Math.max(f.value / maxF * 100, 4)}%"></div></div>
+          <div class="val">${f.value.toLocaleString("vi-VN")}</div>
+        </div>`).join("")}
+
+      <div class="two-col">
+        <div>
+          <h2>Top 5 giảng viên lan toả</h2>
+          <table><thead><tr><th>#</th><th>Giảng viên</th><th>Bài</th><th>Click</th></tr></thead><tbody>
+            ${teachers.slice(0, 5).map((t, i) => `
+              <tr><td>${i + 1}</td><td>${esc(t.ho_ten)}<br><span style="color:var(--muted);font-size:11px;">${esc(t.khoa)}</span></td>
+              <td><b>${t.so_bai_dot_nay}</b></td><td>${t.luot_click}</td></tr>`).join("")}
+          </tbody></table>
+        </div>
+        <div>
+          <h2>Chủ đề thí sinh quan tâm</h2>
+          <table><thead><tr><th>Chủ đề</th><th>Câu hỏi</th><th>%</th></tr></thead><tbody>
+            ${topics.slice(0, 5).map(t => `<tr><td>${esc(t.topic)}</td><td>${t.count}</td><td>${t.pct}%</td></tr>`).join("")}
+          </tbody></table>
+          <h2>Lead tư vấn</h2>
+          <table><tbody>
+            <tr><td>Tổng lead thu được</td><td style="text-align:right;font-weight:800;">${leads.length}</td></tr>
+            <tr><td>Đã gọi tư vấn</td><td style="text-align:right;font-weight:800;">${leads.filter(l => l.trang_thai === "da_goi").length}</td></tr>
+            <tr><td>Đã nộp hồ sơ</td><td style="text-align:right;font-weight:800;color:var(--success);">${leads.filter(l => l.trang_thai === "da_nop_ho_so").length}</td></tr>
+          </tbody></table>
+        </div>
+      </div>
+
+      <h2>Hiệu quả theo nguồn lan toả</h2>
+      <table><thead><tr><th>Nguồn</th><th>Lượt click</th><th>Hồ sơ nộp</th><th>Tỷ lệ chuyển đổi</th></tr></thead><tbody>
+        ${bySource.map(s => `<tr><td>${esc(s.nguon)}</td><td>${s.luot_click.toLocaleString("vi-VN")}</td>
+          <td>${s.ho_so_nop.toLocaleString("vi-VN")}</td><td style="font-weight:700;color:var(--success);">${s.ty_le_chuyen_doi_pct}%</td></tr>`).join("")}
+      </tbody></table>
+
+      <div class="footer">
+        <span>Nền tảng quản lý truyền thông tuyển sinh — Đại học Duy Tân</span>
+        <span>Sản phẩm đề tài NCKH cấp trường · Báo cáo sinh tự động</span>
+      </div>`;
+  } catch (err) {
+    document.getElementById("page").innerHTML =
+      `<div class="loading">Không tải được dữ liệu (${esc(err.message)}).<br>Hãy mở báo cáo từ nút "Xuất báo cáo tuần" trong Nền tảng quản lý.</div>`;
+  }
+}
+build();
+</script>
+</body>
+</html>

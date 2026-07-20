@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#064E3B"/><stop offset=".55" stop-color="#0D9668"/><stop offset="1" stop-color="#4ADE80"/>
+    </linearGradient>
+    <radialGradient id="sheen" cx=".2" cy=".05" r=".9">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity=".22"/><stop offset=".5" stop-color="#FFFFFF" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="dots" width="26" height="26" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1.3" fill="#FFFFFF" opacity=".13"/>
+    </pattern>
+    <filter id="soft" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="12"/>
+    </filter>
+  </defs>
+  <rect width="800" height="450" fill="url(#bg)"/>
+  <rect width="800" height="450" fill="url(#sheen)"/>
+  <rect width="800" height="450" fill="url(#dots)"/>
+  <circle cx="735" cy="55" r="120" fill="#FFFFFF" opacity=".07"/>
+  <circle cx="60" cy="400" r="95" fill="#FFFFFF" opacity=".07"/>
+
+  <g transform="translate(400,222) rotate(-3)">
+    <rect x="-88" y="-90" width="176" height="208" rx="20" fill="#0B0A14" opacity=".28" filter="url(#soft)"/>
+    <rect x="-88" y="-104" width="176" height="208" rx="20" fill="#FFFFFF"/>
+    <rect x="-36" y="-118" width="72" height="30" rx="12" fill="#0D9668"/>
+    <g>
+      <circle cx="-56" cy="-48" r="13" fill="#DCFCE7"/><path d="M-62,-48 l5,5 9,-10" stroke="#0D9668" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <rect x="-32" y="-54" width="96" height="11" rx="5.5" fill="#E2E8F0"/>
+      <circle cx="-56" cy="0" r="13" fill="#DCFCE7"/><path d="M-62,0 l5,5 9,-10" stroke="#0D9668" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <rect x="-32" y="-6" width="76" height="11" rx="5.5" fill="#E2E8F0"/>
+      <circle cx="-56" cy="48" r="13" fill="#FEF3C7"/><circle cx="-56" cy="48" r="6" fill="#F59E0B"/>
+      <rect x="-32" y="42" width="88" height="11" rx="5.5" fill="#E2E8F0"/>
+    </g>
+  </g>
+  <g transform="translate(560,270) rotate(40)">
+    <rect x="-14" y="-56" width="28" height="140" rx="14" fill="#0B0A14" opacity=".28" filter="url(#soft)"/>
+    <rect x="-14" y="-70" width="28" height="112" rx="10" fill="#FBBF24"/>
+    <path d="M-14,42 L0,74 L14,42 Z" fill="#FDE68A"/>
+    <path d="M-6,60 L0,74 L6,60 Z" fill="#1C1B1F"/>
+    <rect x="-14" y="-70" width="28" height="20" rx="10" fill="#F472B6"/>
+  </g>
+  <path d="M250,140 L252.8,147.2 L260,150 L252.8,152.8 L250,160 L247.2,152.8 L240,150 L247.2,147.2 Z" fill="#FFFFFF" opacity=".85"/><path d="M620,131 L622.52,137.48 L629,140 L622.52,142.52 L620,149 L617.48,142.52 L611,140 L617.48,137.48 Z" fill="#FFFFFF" opacity=".75"/><path d="M238,312 L240.24,317.76 L246,320 L240.24,322.24 L238,328 L235.76,322.24 L230,320 L235.76,317.76 Z" fill="#FFFFFF" opacity=".6"/>
+
+  <g opacity=".9">
+    <rect x="42" y="386" width="26" height="5" rx="2.5" fill="#FFFFFF" opacity=".85"/>
+    <text x="42" y="416" font-family="Segoe UI, Arial, sans-serif" font-size="14" font-weight="700"
+      letter-spacing="4.5" fill="#FFFFFF" fill-opacity=".7">ĐẠI HỌC DUY TÂN</text>
+  </g>
+</svg>

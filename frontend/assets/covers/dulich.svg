@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#075E75"/><stop offset=".55" stop-color="#0899B8"/><stop offset="1" stop-color="#7DE6F5"/>
+    </linearGradient>
+    <radialGradient id="sheen" cx=".2" cy=".05" r=".9">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity=".22"/><stop offset=".5" stop-color="#FFFFFF" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="dots" width="26" height="26" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1.3" fill="#FFFFFF" opacity=".13"/>
+    </pattern>
+    <filter id="soft" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="12"/>
+    </filter>
+  </defs>
+  <rect width="800" height="450" fill="url(#bg)"/>
+  <rect width="800" height="450" fill="url(#sheen)"/>
+  <rect width="800" height="450" fill="url(#dots)"/>
+  <circle cx="735" cy="55" r="120" fill="#FFFFFF" opacity=".07"/>
+  <circle cx="60" cy="400" r="95" fill="#FFFFFF" opacity=".07"/>
+
+  <circle cx="565" cy="132" r="42" fill="#FFF7D6" opacity=".95"/>
+  <path d="M150,318 Q225,296 300,318 T450,318 T600,318 T750,318" stroke="#FFFFFF" stroke-width="9" fill="none" opacity=".75" stroke-linecap="round"/>
+  <path d="M190,352 Q265,332 340,352 T490,352 T640,352" stroke="#FFFFFF" stroke-width="7" fill="none" opacity=".4" stroke-linecap="round"/>
+  <path d="M212,232 C300,150 430,140 520,196" stroke="#FFFFFF" stroke-width="4.5" fill="none" stroke-dasharray="2 16" stroke-linecap="round" opacity=".9"/>
+  <g transform="translate(390,196) rotate(14)">
+    <rect x="-52" y="-10" width="104" height="52" rx="10" fill="#0B0A14" opacity=".28" filter="url(#soft)"/>
+    <path d="M-52,10 L52,-24 L6,30 L-8,12 Z" fill="#FFFFFF"/>
+    <path d="M6,30 L10,-8 L52,-24 Z" fill="#D6F3FA"/>
+  </g>
+  <g transform="translate(556,254)">
+    <path d="M0,52 C-24,18 -30,4 -30,-8 a30,30 0 1,1 60,0 C30,4 24,18 0,52 Z" fill="#FFFFFF"/>
+    <circle cx="0" cy="-8" r="12" fill="#0899B8"/>
+  </g>
+  <path d="M250,140 L252.8,147.2 L260,150 L252.8,152.8 L250,160 L247.2,152.8 L240,150 L247.2,147.2 Z" fill="#FFFFFF" opacity=".85"/><path d="M660,202 L662.24,207.76 L668,210 L662.24,212.24 L660,218 L657.76,212.24 L652,210 L657.76,207.76 Z" fill="#FFFFFF" opacity=".7"/>
+
+  <g opacity=".9">
+    <rect x="42" y="386" width="26" height="5" rx="2.5" fill="#FFFFFF" opacity=".85"/>
+    <text x="42" y="416" font-family="Segoe UI, Arial, sans-serif" font-size="14" font-weight="700"
+      letter-spacing="4.5" fill="#FFFFFF" fill-opacity=".7">ĐẠI HỌC DUY TÂN</text>
+  </g>
+</svg>

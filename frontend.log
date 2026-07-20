@@ -1,0 +1,20 @@
+::1 - - [18/Jul/2026 08:32:19] "GET /tuyensinh/index.html HTTP/1.1" 200 -
+::1 - - [18/Jul/2026 08:32:23] "GET /tuyensinh/index.html HTTP/1.1" 200 -
+::1 - - [18/Jul/2026 08:32:23] "GET /assets/logo.png HTTP/1.1" 200 -
+::1 - - [18/Jul/2026 08:32:24] code 404, message File not found
+::1 - - [18/Jul/2026 08:32:24] "GET /favicon.ico HTTP/1.1" 404 -
+::1 - - [18/Jul/2026 08:41:17] "GET /tuyensinh/index.html HTTP/1.1" 200 -
+::1 - - [18/Jul/2026 08:41:17] "GET /assets/logo.png HTTP/1.1" 200 -
+::1 - - [18/Jul/2026 08:41:17] code 404, message File not found
+::1 - - [18/Jul/2026 08:41:17] "GET /favicon.ico HTTP/1.1" 404 -
+::1 - - [18/Jul/2026 08:41:31] "GET /platform/index.html HTTP/1.1" 200 -
+::1 - - [18/Jul/2026 08:41:43] "GET /tuyensinh/index.html HTTP/1.1" 304 -
+::1 - - [18/Jul/2026 08:41:43] "GET /assets/logo.png HTTP/1.1" 304 -
+::1 - - [18/Jul/2026 08:41:43] code 404, message File not found
+::1 - - [18/Jul/2026 08:41:43] "GET /favicon.ico HTTP/1.1" 404 -
+::1 - - [18/Jul/2026 08:41:45] "GET /tuyensinh/index.html HTTP/1.1" 304 -
+::1 - - [18/Jul/2026 08:41:45] code 404, message File not found
+::1 - - [18/Jul/2026 08:41:45] "GET /favicon.ico HTTP/1.1" 404 -
+::1 - - [18/Jul/2026 08:42:01] "GET /portal/index.html HTTP/1.1" 200 -
+::1 - - [18/Jul/2026 08:45:07] "GET /tuyensinh/index.html HTTP/1.1" 200 -
+::1 - - [18/Jul/2026 08:45:33] "GET /tuyensinh/index.html HTTP/1.1" 200 -

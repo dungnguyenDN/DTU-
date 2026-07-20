@@ -1,0 +1,1370 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cổng chia sẻ nội dung — Đại học Duy Tân</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --red:#C8393F;
+    --red-dark:#A32B31;
+    --red-tint:#FBEAEB;
+    --ink:#1C1B1F;
+    --ink-2:#2A2930;
+    --bg:#F6F5F8;
+    --card:#FFFFFF;
+    --text:#1C1B1F;
+    --muted:#7A7880;
+    --line:#E9E7EC;
+    --success:#1E7A4C;
+    --success-tint:#E7F4EC;
+    --violet:#6D28D9;
+    --shadow-sm:0 1px 2px rgba(28,27,31,.05), 0 4px 14px rgba(28,27,31,.05);
+    --shadow-md:0 6px 24px rgba(28,27,31,.10);
+    --shadow-lg:0 18px 60px rgba(28,27,31,.22);
+    --radius:20px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    font-family:'Be Vietnam Pro',system-ui,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+  button{font-family:inherit;}
+
+  /* ===================== ICONS ===================== */
+  svg.icon{
+    width:18px;height:18px;flex-shrink:0;
+    stroke:currentColor;fill:none;stroke-width:2;
+    stroke-linecap:round;stroke-linejoin:round;
+    display:inline-block;vertical-align:-3px;
+  }
+  svg.icon-sm{width:14px;height:14px;vertical-align:-2px;}
+  svg.icon-lg{width:22px;height:22px;}
+  svg.icon-xl{width:30px;height:30px;stroke-width:1.8;}
+
+  /* ===================== TOPBAR ===================== */
+  .topbar{
+    position:sticky;top:0;z-index:40;
+    background:rgba(255,255,255,.85);
+    backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+    border-bottom:1px solid var(--line);
+    padding:12px 28px;
+    display:flex;align-items:center;justify-content:space-between;gap:16px;
+  }
+  .brand{display:flex;align-items:center;gap:12px;}
+  .brand img{height:30px;display:block;}
+  .brand .divider{width:1px;height:22px;background:var(--line);}
+  .brand .title{font-family:'Manrope',sans-serif;font-weight:800;font-size:14.5px;letter-spacing:.1px;}
+  .brand .title span{color:var(--red);}
+  .userchip{
+    display:flex;align-items:center;gap:10px;
+    background:var(--card);border:1px solid var(--line);
+    padding:6px 14px 6px 6px;border-radius:999px;box-shadow:var(--shadow-sm);
+  }
+  .avatar{
+    width:32px;height:32px;border-radius:50%;
+    background:linear-gradient(135deg,var(--red),#E8734A);
+    color:#fff;display:flex;align-items:center;justify-content:center;
+    font-weight:700;font-size:12px;flex-shrink:0;
+  }
+  .userchip .name{font-size:13px;font-weight:600;line-height:1.1;}
+  .userchip .tier{font-size:11px;color:var(--muted);}
+  .logout{
+    border:none;background:none;color:var(--muted);font-size:12.5px;cursor:pointer;
+    padding:6px 8px;border-radius:8px;
+  }
+  .logout:hover{background:var(--red-tint);color:var(--red);}
+
+  .wrap{max-width:1140px;margin:0 auto;padding:30px 24px 80px;}
+
+  /* ===================== HERO ===================== */
+  .greeting-row{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:18px;}
+  h1.greeting{font-family:'Manrope',sans-serif;font-size:28px;font-weight:800;margin:0;letter-spacing:-.3px;}
+  .greeting-sub{color:var(--muted);font-size:14px;margin-top:6px;}
+
+  .season-banner{
+    position:relative;overflow:hidden;
+    border-radius:24px;
+    background:linear-gradient(120deg,#1B1A21 0%,#332028 55%,#4E2027 100%);
+    color:#fff;
+    padding:26px 30px;
+    margin-bottom:26px;
+    box-shadow:var(--shadow-md);
+    display:flex;align-items:center;gap:24px;flex-wrap:wrap;
+  }
+  .season-banner::before{
+    content:"";position:absolute;right:-80px;top:-120px;width:340px;height:340px;border-radius:50%;
+    background:radial-gradient(circle,rgba(200,57,63,.5),transparent 65%);
+    animation:pulse 6s ease-in-out infinite;
+  }
+  .season-banner::after{
+    content:"";position:absolute;left:30%;bottom:-140px;width:280px;height:280px;border-radius:50%;
+    background:radial-gradient(circle,rgba(240,150,90,.22),transparent 65%);
+    animation:pulse 7s ease-in-out infinite reverse;
+  }
+  @keyframes pulse{0%,100%{transform:scale(1);opacity:.9;}50%{transform:scale(1.15);opacity:.6;}}
+  .season-icon{
+    position:relative;z-index:1;
+    width:68px;height:68px;border-radius:20px;flex-shrink:0;
+    background:rgba(255,255,255,.09);
+    border:1px solid rgba(255,255,255,.16);
+    display:flex;align-items:center;justify-content:center;
+    color:#F0A9A9;
+  }
+  .season-icon svg.icon{width:32px;height:32px;stroke-width:1.7;}
+  .season-info{position:relative;z-index:1;flex:1;min-width:260px;}
+  .season-eyebrow{font-size:11.5px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:#F0A9A9;margin-bottom:6px;}
+  .season-name{font-family:'Manrope',sans-serif;font-size:22px;font-weight:800;margin:0 0 6px;}
+  .season-desc{font-size:13.5px;line-height:1.55;opacity:.85;max-width:640px;margin:0 0 14px;}
+  .season-chips{display:flex;gap:10px;flex-wrap:wrap;}
+  .chip{
+    display:inline-flex;align-items:center;gap:7px;
+    background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.16);
+    border-radius:999px;padding:6px 13px;font-size:12.5px;font-weight:600;
+  }
+  .chip svg.icon{width:14px;height:14px;opacity:.8;}
+
+  /* ===================== STATS ===================== */
+  .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:34px;}
+  @media (max-width:900px){.stats-grid{grid-template-columns:repeat(2,1fr);}}
+  @media (max-width:520px){.stats-grid{grid-template-columns:1fr;}}
+  .stat-card{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:20px 22px;box-shadow:var(--shadow-sm);
+    display:flex;align-items:center;gap:16px;
+    transition:transform .18s ease, box-shadow .18s ease;
+  }
+  .stat-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-md);}
+  .stat-label{font-size:12px;color:var(--muted);font-weight:600;margin-bottom:4px;}
+  .stat-value{font-family:'Manrope',sans-serif;font-size:24px;font-weight:800;line-height:1.1;}
+  .stat-sub{font-size:11.5px;color:var(--muted);margin-top:4px;}
+  .ring{width:64px;height:64px;position:relative;flex-shrink:0;}
+  .ring svg{transform:rotate(-90deg);display:block;}
+  .ring-track{stroke:#EFEDF1;}
+  .ring-fill{stroke:var(--red);stroke-linecap:round;transition:stroke-dashoffset 1s cubic-bezier(.22,1,.36,1);}
+  .ring-label{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Manrope',sans-serif;font-weight:800;font-size:14px;}
+  .stat-emblem{
+    width:52px;height:52px;border-radius:16px;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .stat-emblem svg.icon{width:24px;height:24px;stroke-width:1.9;}
+  .emblem-click{background:#FDF1E7;color:#B4520F;}
+  .emblem-rank{background:#EEF0FB;color:#4338CA;}
+  .tier-badge{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 12px;font-size:12.5px;font-weight:700;}
+  .tier-badge svg.icon{width:14px;height:14px;}
+  .tier-bronze{background:#F6EAE1;color:#8A5A2E;}
+  .tier-silver{background:#EEF0F4;color:#5C6470;}
+  .tier-gold{background:#FBF3D9;color:#8A6D00;}
+  .tier-diamond{background:#E5F4FB;color:#0E6BA8;}
+  .emblem-tier-bronze{background:#F6EAE1;color:#8A5A2E;}
+  .emblem-tier-silver{background:#EEF0F4;color:#5C6470;}
+  .emblem-tier-gold{background:#FBF3D9;color:#8A6D00;}
+  .emblem-tier-diamond{background:#E5F4FB;color:#0E6BA8;}
+
+  /* ===================== BADGES ===================== */
+  .badge-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;}
+  @media (max-width:980px){.badge-grid{grid-template-columns:repeat(3,1fr);}}
+  @media (max-width:560px){.badge-grid{grid-template-columns:repeat(2,1fr);}}
+  .badge-card{
+    position:relative;border:1px solid var(--line);border-radius:16px;
+    padding:16px 10px 14px;text-align:center;
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .badge-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-sm);}
+  .badge-card.unlocked{border-color:#F0DCA8;background:linear-gradient(180deg,#FFFBEF,#FFF);}
+  .badge-card.locked{opacity:.72;}
+  .b-ic{
+    width:46px;height:46px;border-radius:50%;margin:0 auto 9px;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .b-ic svg.icon{width:21px;height:21px;}
+  .badge-card.unlocked .b-ic{
+    background:linear-gradient(135deg,#F7C948,#E8734A);color:#fff;
+    box-shadow:0 5px 14px rgba(232,115,74,.35);
+  }
+  .badge-card.locked .b-ic{background:#F1EFF3;color:#B4B2B8;}
+  .b-name{font-size:12px;font-weight:800;line-height:1.3;}
+  .b-progress{font-size:10.5px;color:var(--muted);margin-top:4px;font-weight:600;}
+  .b-check{
+    position:absolute;top:8px;right:8px;width:18px;height:18px;border-radius:50%;
+    background:var(--success);color:#fff;display:flex;align-items:center;justify-content:center;
+  }
+  .b-check svg.icon{width:10px;height:10px;stroke-width:3;}
+  .b-bar{height:4px;border-radius:2px;background:#EFEDF1;margin-top:7px;overflow:hidden;}
+  .b-bar i{display:block;height:100%;background:linear-gradient(90deg,#E8734A,var(--red));border-radius:2px;}
+
+  /* ===================== SECTION HEADERS ===================== */
+  .section-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin:0 0 16px;flex-wrap:wrap;}
+  .section-title{font-family:'Manrope',sans-serif;font-size:19px;font-weight:800;margin:0;display:flex;align-items:center;gap:10px;}
+  .ai-tag{
+    display:inline-flex;align-items:center;gap:5px;
+    font-size:10.5px;font-weight:800;letter-spacing:.8px;color:#fff;
+    background:linear-gradient(120deg,var(--violet),var(--red));
+    border-radius:999px;padding:5px 11px;
+  }
+  .ai-tag svg.icon{width:12px;height:12px;}
+  .section-note{font-size:12.5px;color:var(--muted);}
+
+  /* ===================== SUGGESTIONS ===================== */
+  .suggest-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:40px;}
+  @media (max-width:980px){.suggest-grid{grid-template-columns:repeat(2,1fr);}}
+  @media (max-width:640px){.suggest-grid{grid-template-columns:1fr;}}
+  .suggest-card{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    overflow:hidden;box-shadow:var(--shadow-sm);display:flex;flex-direction:column;
+    transition:transform .18s ease, box-shadow .18s ease;cursor:pointer;
+  }
+  .suggest-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-md);}
+  .suggest-card:hover .suggest-cover img{transform:scale(1.05);}
+  .suggest-cover{
+    height:150px;position:relative;display:flex;align-items:flex-end;padding:13px 16px;
+    color:#fff;overflow:hidden;background:#1B1A21;
+  }
+  .suggest-cover img{
+    position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+    transition:transform .5s ease;
+  }
+  .cover-shade{
+    position:absolute;inset:0;
+    background:linear-gradient(180deg,rgba(23,22,29,.05) 35%,rgba(23,22,29,.66) 100%);
+  }
+  .cover-label{
+    font-size:10.5px;font-weight:800;letter-spacing:1.1px;text-transform:uppercase;
+    position:relative;z-index:1;opacity:.95;
+  }
+  .score-pill{
+    position:absolute;top:12px;right:12px;z-index:1;
+    display:inline-flex;align-items:center;gap:5px;
+    background:rgba(18,16,20,.55);backdrop-filter:blur(6px);
+    border:1px solid rgba(255,255,255,.25);
+    color:#fff;border-radius:999px;padding:4px 11px;font-size:11.5px;font-weight:700;
+  }
+  .score-pill svg.icon{width:12px;height:12px;color:#F7C948;}
+  .suggest-body{padding:15px 17px 13px;display:flex;flex-direction:column;flex:1;gap:8px;}
+  .suggest-title{font-family:'Manrope',sans-serif;font-size:15.5px;font-weight:800;line-height:1.35;margin:0;}
+  .suggest-meta{font-size:12px;color:var(--muted);}
+  .suggest-reason{
+    display:flex;gap:8px;
+    font-size:12.5px;color:#6E5A2E;background:#FBF6E8;border-radius:10px;
+    padding:9px 12px;line-height:1.5;
+  }
+  .suggest-reason svg.icon{width:15px;height:15px;color:#B98A00;margin-top:1px;}
+  .suggest-reason span{
+    display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;
+  }
+  .suggest-foot{padding:0 17px 17px;margin-top:auto;}
+  .btn{
+    border:none;border-radius:12px;padding:12px 18px;font-size:13.5px;font-weight:700;
+    cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    transition:transform .12s ease, box-shadow .12s ease, opacity .12s ease, background .12s ease;
+  }
+  .btn:active{transform:scale(.98);}
+  .btn svg.icon{width:16px;height:16px;}
+  .btn-primary{background:var(--red);color:#fff;box-shadow:0 6px 18px rgba(200,57,63,.30);}
+  .btn-primary:hover{background:var(--red-dark);}
+  .btn-primary:disabled{background:#CFCBD4;box-shadow:none;cursor:default;}
+  .btn-ghost{background:transparent;border:1px solid var(--line);color:var(--text);}
+  .btn-ghost:hover{background:#F1EFF3;}
+  .btn-block{width:100%;}
+
+  /* ===================== TWO-COLUMN ===================== */
+  .columns{display:grid;grid-template-columns:1.15fr .85fr;gap:18px;align-items:start;}
+  @media (max-width:900px){.columns{grid-template-columns:1fr;}}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow-sm);padding:22px 24px;}
+  .panel h3{font-family:'Manrope',sans-serif;font-size:16px;font-weight:800;margin:0 0 4px;display:flex;align-items:center;gap:9px;}
+  .panel h3 svg.icon{width:18px;height:18px;color:var(--red);}
+  .panel .panel-sub{font-size:12.5px;color:var(--muted);margin:0 0 16px;}
+
+  /* Leaderboard */
+  .lb-row{
+    display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:14px;
+    transition:background .15s ease;
+  }
+  .lb-row + .lb-row{margin-top:2px;}
+  .lb-row.me{background:var(--red-tint);}
+  .rank-badge{
+    width:28px;height:28px;border-radius:50%;flex-shrink:0;
+    display:inline-flex;align-items:center;justify-content:center;
+    font-family:'Manrope',sans-serif;font-weight:800;font-size:12px;
+    background:#F1EFF3;color:var(--muted);
+  }
+  .rank-1{background:linear-gradient(135deg,#F7C948,#C99A06);color:#fff;box-shadow:0 3px 8px rgba(201,154,6,.35);}
+  .rank-2{background:linear-gradient(135deg,#C9CFD9,#8E97A5);color:#fff;box-shadow:0 3px 8px rgba(142,151,165,.35);}
+  .rank-3{background:linear-gradient(135deg,#DCA164,#A06A32);color:#fff;box-shadow:0 3px 8px rgba(160,106,50,.35);}
+  .lb-avatar{
+    width:36px;height:36px;border-radius:50%;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11.5px;color:#fff;
+  }
+  .lb-info{flex:1;min-width:0;}
+  .lb-name{font-size:13.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .lb-name .you{color:var(--red);font-size:11px;font-weight:800;margin-left:6px;}
+  .lb-khoa{font-size:11.5px;color:var(--muted);}
+  .lb-stats{text-align:right;flex-shrink:0;}
+  .lb-count{font-size:13px;font-weight:800;font-family:'Manrope',sans-serif;}
+  .lb-clicks{font-size:11px;color:var(--muted);}
+
+  /* Khoa race bars */
+  .khoa-row{display:flex;align-items:center;gap:10px;margin-bottom:9px;font-size:12.5px;}
+  .khoa-row .k-name{width:118px;flex-shrink:0;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .khoa-row.me .k-name{font-weight:800;color:var(--red);}
+  .khoa-row .k-track{flex:1;background:#F0EFF1;border-radius:7px;height:22px;overflow:hidden;}
+  .khoa-row .k-fill{
+    height:100%;border-radius:7px;background:linear-gradient(90deg,#D9D6DC,#B4B2B8);
+    display:flex;align-items:center;justify-content:flex-end;padding-right:8px;
+    color:#fff;font-size:11px;font-weight:800;min-width:26px;
+    transition:width .8s cubic-bezier(.22,1,.36,1);
+  }
+  .khoa-row.me .k-fill{background:linear-gradient(90deg,#E8734A,var(--red));}
+  .khoa-row .k-clicks{width:64px;text-align:right;font-size:11px;color:var(--muted);flex-shrink:0;}
+
+  /* Channel chips (đa kênh) */
+  .channel-chip{
+    border:1.5px solid var(--line);background:#fff;border-radius:999px;
+    padding:7px 14px;font-size:12.5px;font-weight:700;cursor:pointer;color:var(--muted);
+    transition:all .15s ease;
+  }
+  .channel-chip:hover{border-color:#CFCBD4;}
+  .channel-chip.active{border-color:var(--ink);color:var(--ink);background:#F1EFF3;}
+
+  /* Activity chart */
+  .chart{display:flex;align-items:flex-end;gap:8px;height:110px;margin:8px 0 4px;}
+  .chart .col{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end;}
+  .chart .bar{
+    width:100%;max-width:34px;border-radius:8px 8px 4px 4px;
+    background:linear-gradient(180deg,#E88A8E,var(--red));
+    min-height:4px;transition:height .8s cubic-bezier(.22,1,.36,1);
+  }
+  .chart .bar.zero{background:#EFEDF1;}
+  .chart .day{font-size:10.5px;color:var(--muted);font-weight:600;}
+  .chart .val{font-size:10.5px;font-weight:700;color:var(--red);height:14px;}
+
+  /* History timeline */
+  .timeline{margin-top:14px;}
+  .tl-item{display:flex;gap:13px;position:relative;padding-bottom:16px;}
+  .tl-item:last-child{padding-bottom:0;}
+  .tl-item::before{
+    content:"";position:absolute;left:5px;top:16px;bottom:0;width:2px;background:var(--line);
+  }
+  .tl-item:last-child::before{display:none;}
+  .tl-dot{width:12px;height:12px;border-radius:50%;background:var(--success);border:2.5px solid #fff;box-shadow:0 0 0 2px var(--success);flex-shrink:0;margin-top:3px;}
+  .tl-body{flex:1;min-width:0;}
+  .tl-title{font-size:13px;font-weight:700;line-height:1.4;}
+  .tl-meta{font-size:11.5px;color:var(--muted);margin-top:2px;}
+  .tl-clicks{
+    display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;color:var(--success);
+    background:var(--success-tint);border-radius:999px;padding:2px 9px;margin-left:8px;
+  }
+  .tl-clicks svg.icon{width:11px;height:11px;}
+  .empty-hint{color:var(--muted);font-size:13px;padding:14px 0;}
+
+  /* ===================== MODAL ===================== */
+  .modal-backdrop{
+    position:fixed;inset:0;background:rgba(24,22,26,.55);backdrop-filter:blur(6px);
+    z-index:60;display:flex;align-items:center;justify-content:center;padding:20px;
+    opacity:0;pointer-events:none;transition:opacity .22s ease;
+  }
+  .modal-backdrop.open{opacity:1;pointer-events:auto;}
+  .modal{
+    background:var(--card);border-radius:24px;max-width:640px;width:100%;
+    max-height:calc(100vh - 60px);overflow-y:auto;box-shadow:var(--shadow-lg);
+    transform:translateY(16px) scale(.98);transition:transform .22s ease;
+  }
+  .modal-backdrop.open .modal{transform:translateY(0) scale(1);}
+  .modal-cover{
+    height:130px;position:relative;display:flex;align-items:flex-end;padding:14px 24px;
+    color:#fff;overflow:hidden;background:#1B1A21;
+  }
+  .modal-cover img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+  .modal-close{
+    position:absolute;top:12px;right:14px;z-index:2;
+    width:32px;height:32px;border-radius:50%;border:none;cursor:pointer;
+    background:rgba(20,18,22,.45);color:#fff;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .modal-close svg.icon{width:15px;height:15px;}
+  .modal-body{padding:20px 26px 26px;}
+  .modal-title{font-family:'Manrope',sans-serif;font-size:19px;font-weight:800;margin:0 0 4px;}
+  .modal-meta{font-size:12.5px;color:var(--muted);margin-bottom:14px;}
+  .modal-reason{
+    display:flex;gap:9px;
+    font-size:12.5px;color:#6E5A2E;background:#FBF6E8;border-radius:12px;
+    padding:11px 14px;line-height:1.55;margin-bottom:18px;
+  }
+  .modal-reason svg.icon{width:16px;height:16px;color:#B98A00;margin-top:1px;flex-shrink:0;}
+  .tone-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
+  .tone-label{font-size:12.5px;font-weight:700;color:var(--muted);}
+  .tone-chip{
+    border:1.5px solid var(--line);background:#fff;border-radius:999px;
+    padding:7px 14px;font-size:12.5px;font-weight:700;cursor:pointer;color:var(--muted);
+    transition:all .15s ease;
+  }
+  .tone-chip:hover{border-color:#CFCBD4;}
+  .tone-chip.active{border-color:var(--red);color:var(--red);background:var(--red-tint);}
+  .caption-box{
+    width:100%;min-height:190px;border:1.5px solid var(--line);border-radius:14px;
+    padding:14px 16px;font-size:13.8px;line-height:1.65;font-family:'Be Vietnam Pro',sans-serif;
+    resize:vertical;color:var(--text);background:#FBFAFC;
+  }
+  .caption-box:focus{outline:2px solid var(--red);outline-offset:1px;background:#fff;}
+  .ai-rewrite{
+    background:linear-gradient(120deg,var(--violet),var(--red));color:#fff;
+    box-shadow:0 6px 18px rgba(109,40,217,.25);
+  }
+  .ai-rewrite:hover{opacity:.93;}
+  .ai-rewrite:disabled{opacity:.6;cursor:wait;}
+  .modal-actions{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;}
+  .modal-actions .btn-primary{flex:1;min-width:180px;}
+  .utm-note{
+    display:flex;gap:8px;align-items:flex-start;
+    font-size:11.5px;color:var(--muted);margin-top:12px;line-height:1.5;
+  }
+  .utm-note svg.icon{width:14px;height:14px;margin-top:1px;flex-shrink:0;color:var(--success);}
+  .ai-source-note{font-size:11.5px;color:var(--violet);font-weight:600;margin-top:8px;min-height:16px;}
+  .spinner{
+    width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,255,255,.4);
+    border-top-color:#fff;animation:spin .7s linear infinite;display:inline-block;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  /* ===================== SHARE STEPS ===================== */
+  .step-row{display:flex;gap:11px;align-items:flex-start;margin-bottom:13px;font-size:13.5px;line-height:1.6;}
+  .step-ic{
+    width:24px;height:24px;border-radius:50%;flex-shrink:0;margin-top:1px;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .step-ic.done{background:var(--success-tint);color:var(--success);}
+  .step-ic.todo{background:var(--red-tint);color:var(--red);font-weight:800;font-size:12.5px;font-family:'Manrope',sans-serif;}
+  .step-ic svg.icon{width:13px;height:13px;stroke-width:2.6;}
+  .mini-caption{
+    max-height:130px;overflow:auto;background:#FBFAFC;border:1px solid var(--line);
+    border-radius:12px;padding:11px 14px;font-size:12px;line-height:1.65;
+    white-space:pre-wrap;color:var(--ink-2);margin:4px 0 14px;
+  }
+  .fb-policy-note{
+    display:flex;gap:8px;align-items:flex-start;
+    background:#FBF6E8;border-radius:10px;padding:10px 12px;
+    font-size:11.5px;color:#6E5A2E;line-height:1.55;margin-bottom:16px;
+  }
+  .fb-policy-note svg.icon{width:14px;height:14px;color:#B98A00;margin-top:1px;flex-shrink:0;}
+
+  /* ===================== TOAST ===================== */
+  .toast{
+    position:fixed;left:50%;bottom:28px;transform:translate(-50%,20px);
+    background:var(--ink);color:#fff;padding:13px 22px;border-radius:12px;
+    font-size:13.5px;font-weight:600;opacity:0;pointer-events:none;
+    transition:opacity .25s ease, transform .25s ease;z-index:80;
+    display:flex;align-items:center;gap:8px;box-shadow:var(--shadow-lg);max-width:90vw;
+  }
+  .toast.show{opacity:1;transform:translate(-50%,0);}
+  .toast.success{background:var(--success);}
+
+  /* ===================== SKELETON ===================== */
+  .skeleton{
+    background:linear-gradient(90deg,#EFEDF1 25%,#F7F5F9 50%,#EFEDF1 75%);
+    background-size:200% 100%;animation:shimmer 1.4s infinite;border-radius:12px;
+  }
+  @keyframes shimmer{to{background-position:-200% 0;}}
+
+  /* ===================== LOGIN ===================== */
+  .login-overlay{
+    position:fixed;inset:0;z-index:100;
+    background:radial-gradient(1100px 600px at 15% -10%, #45222A 0%, transparent 60%),
+               radial-gradient(900px 600px at 110% 110%, #3A2540 0%, transparent 55%),
+               linear-gradient(140deg,#191720,#241C22 60%,#1B1720);
+    display:flex;align-items:center;justify-content:center;padding:20px;overflow:hidden;
+  }
+  .login-blob{position:absolute;border-radius:50%;filter:blur(70px);opacity:.5;animation:float 9s ease-in-out infinite;}
+  .blob-1{width:320px;height:320px;background:#C8393F;top:-90px;right:8%;}
+  .blob-2{width:260px;height:260px;background:#6D28D9;bottom:-70px;left:6%;animation-delay:-4s;}
+  @keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(28px);}}
+  .login-card{
+    position:relative;background:rgba(255,255,255,.97);border-radius:24px;
+    padding:38px 36px 30px;width:100%;max-width:390px;box-shadow:var(--shadow-lg);
+  }
+  .login-logo{width:150px;display:block;margin:0 auto 20px;}
+  .login-card h2{font-family:'Manrope',sans-serif;font-size:19px;text-align:center;margin:0 0 4px;font-weight:800;}
+  .login-sub{text-align:center;color:var(--muted);font-size:12.5px;margin:0 0 22px;}
+  .login-card input{
+    width:100%;padding:13px 15px;border:1.5px solid var(--line);border-radius:12px;
+    font-size:14px;margin-bottom:10px;font-family:'Be Vietnam Pro',sans-serif;
+  }
+  .login-card input:focus{outline:2px solid var(--red);outline-offset:1px;}
+  .login-btn{
+    width:100%;padding:13px;border:none;border-radius:12px;background:var(--red);color:#fff;
+    font-weight:700;font-size:14px;cursor:pointer;margin-top:4px;
+    box-shadow:0 8px 22px rgba(200,57,63,.35);
+  }
+  .login-btn:hover{background:var(--red-dark);}
+  .login-btn:disabled{opacity:.6;cursor:default;}
+  .login-error{color:#C0392B;font-size:12.5px;margin-top:10px;min-height:16px;text-align:center;}
+  .demo-fill{
+    width:100%;margin-top:10px;padding:10px;border-radius:12px;border:1.5px dashed var(--line);
+    background:none;font-size:12px;color:var(--muted);cursor:pointer;font-weight:600;
+    display:flex;align-items:center;justify-content:center;gap:6px;
+  }
+  .demo-fill svg.icon{width:13px;height:13px;}
+  .demo-fill:hover{border-color:var(--red);color:var(--red);}
+
+  #confettiCanvas{position:fixed;inset:0;pointer-events:none;z-index:90;}
+</style>
+</head>
+<body>
+
+<!-- ===================== SVG ICON SPRITE ===================== -->
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none;">
+  <symbol id="i-sparkles" viewBox="0 0 24 24"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/><path d="M20 3v4"/><path d="M22 5h-4"/></symbol>
+  <symbol id="i-flame" viewBox="0 0 24 24"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></symbol>
+  <symbol id="i-compass" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+  <symbol id="i-clipboard" viewBox="0 0 24 24"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></symbol>
+  <symbol id="i-hash" viewBox="0 0 24 24"><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/></symbol>
+  <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></symbol>
+  <symbol id="i-award" viewBox="0 0 24 24"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></symbol>
+  <symbol id="i-gem" viewBox="0 0 24 24"><path d="M6 3h12l4 6-10 13L2 9Z"/><path d="M11 3 8 9l4 13 4-13-3-6"/><path d="M2 9h20"/></symbol>
+  <symbol id="i-trophy" viewBox="0 0 24 24"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></symbol>
+  <symbol id="i-history" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></symbol>
+  <symbol id="i-lightbulb" viewBox="0 0 24 24"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></symbol>
+  <symbol id="i-share" viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1 1 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></symbol>
+  <symbol id="i-zap" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></symbol>
+  <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></symbol>
+  <symbol id="i-arrow-right" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></symbol>
+</svg>
+
+<!-- ===================== LOGIN ===================== -->
+<div id="loginOverlay" class="login-overlay">
+  <div class="login-blob blob-1"></div>
+  <div class="login-blob blob-2"></div>
+  <div class="login-card">
+    <img src="../assets/logo.png" alt="Đại học Duy Tân" class="login-logo">
+    <h2>Cổng chia sẻ nội dung</h2>
+    <p class="login-sub">Dành cho giảng viên & cố vấn học tập — Đại học Duy Tân</p>
+    <input id="loginEmail" type="email" placeholder="Email" autocomplete="username">
+    <input id="loginPassword" type="password" placeholder="Mật khẩu" autocomplete="current-password">
+    <button id="loginBtn" class="login-btn">Đăng nhập</button>
+    <div id="loginError" class="login-error"></div>
+    <button class="demo-fill" id="demoFillBtn"><svg class="icon"><use href="#i-zap"/></svg>Điền nhanh tài khoản demo giảng viên</button>
+  </div>
+</div>
+
+<!-- ===================== APP ===================== -->
+<div id="appRoot" style="display:none;">
+  <div class="topbar">
+    <div class="brand">
+      <img src="../assets/logo.png" alt="Đại học Duy Tân">
+      <div class="divider"></div>
+      <div class="title">Cổng chia sẻ <span>nội dung</span></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <div class="userchip">
+        <div class="avatar" id="avatarInitial">GV</div>
+        <div>
+          <div class="name" id="teacherNameLabel">—</div>
+          <div class="tier" id="teacherTierLabel">—</div>
+        </div>
+      </div>
+      <button class="logout" id="logoutBtn">Đăng xuất</button>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="greeting-row">
+      <div>
+        <h1 class="greeting" id="greetingText">Chào bạn</h1>
+        <div class="greeting-sub" id="todayText"></div>
+      </div>
+    </div>
+
+    <!-- Season banner -->
+    <div class="season-banner" id="seasonBanner">
+      <div class="season-icon" id="seasonIcon"></div>
+      <div class="season-info">
+        <div class="season-eyebrow">Giai đoạn truyền thông hiện tại</div>
+        <h2 class="season-name" id="seasonName">Đang phân tích mùa vụ...</h2>
+        <p class="season-desc" id="seasonDesc"></p>
+        <div class="season-chips">
+          <span class="chip" id="seasonGoldenHour" style="display:none;"><svg class="icon"><use href="#i-clock"/></svg><span></span></span>
+          <span class="chip" id="seasonHashtag" style="display:none;"><svg class="icon"><use href="#i-hash"/></svg><span></span></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid" id="statsGrid">
+      <div class="stat-card">
+        <div class="ring">
+          <svg width="64" height="64" viewBox="0 0 64 64">
+            <circle class="ring-track" cx="32" cy="32" r="26" fill="none" stroke-width="7"></circle>
+            <circle class="ring-fill" id="ringFill" cx="32" cy="32" r="26" fill="none" stroke-width="7"
+              stroke-dasharray="163.4" stroke-dashoffset="163.4"></circle>
+          </svg>
+          <div class="ring-label" id="ringLabel">–</div>
+        </div>
+        <div>
+          <div class="stat-label">Chỉ tiêu đợt này</div>
+          <div class="stat-value" id="statShared">–</div>
+          <div class="stat-sub" id="statSharedSub"></div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-emblem emblem-click"><svg class="icon"><use href="#i-link"/></svg></div>
+        <div>
+          <div class="stat-label">Lượt click đợt này</div>
+          <div class="stat-value" id="statClicks">–</div>
+          <div class="stat-sub">từ link bạn chia sẻ</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-emblem emblem-tier-bronze" id="tierEmblem"><svg class="icon"><use href="#i-award"/></svg></div>
+        <div>
+          <div class="stat-label">Cấp bậc cộng tác</div>
+          <div class="stat-value" id="statTier" style="font-size:19px;">–</div>
+          <div class="stat-sub" id="statTierSub"></div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-emblem emblem-rank"><svg class="icon"><use href="#i-trophy"/></svg></div>
+        <div>
+          <div class="stat-label">Xếp hạng đợt này</div>
+          <div class="stat-value" id="statRank">–</div>
+          <div class="stat-sub" id="statRankSub"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Badges -->
+    <div class="panel" style="margin-bottom:34px;">
+      <h3><svg class="icon"><use href="#i-award"/></svg>Huy hiệu thành tích</h3>
+      <p class="panel-sub">Mở khoá huy hiệu bằng hoạt động lan toả của bạn — huy hiệu sáng là đã đạt</p>
+      <div class="badge-grid" id="badgeGrid">
+        <div class="skeleton" style="height:110px;"></div>
+        <div class="skeleton" style="height:110px;"></div>
+        <div class="skeleton" style="height:110px;"></div>
+        <div class="skeleton" style="height:110px;"></div>
+        <div class="skeleton" style="height:110px;"></div>
+        <div class="skeleton" style="height:110px;"></div>
+      </div>
+    </div>
+
+    <!-- AI suggestions -->
+    <div class="section-head">
+      <h2 class="section-title">Bài đề xuất cho bạn hôm nay
+        <span class="ai-tag"><svg class="icon"><use href="#i-sparkles"/></svg>AI ĐỀ XUẤT</span>
+      </h2>
+      <span class="section-note" id="suggestNote"></span>
+    </div>
+    <div class="suggest-grid" id="suggestGrid">
+      <div class="skeleton" style="height:320px;"></div>
+      <div class="skeleton" style="height:320px;"></div>
+      <div class="skeleton" style="height:320px;"></div>
+    </div>
+
+    <!-- Leaderboard + activity -->
+    <div class="columns">
+      <div style="display:flex;flex-direction:column;gap:18px;">
+        <div class="panel">
+          <h3><svg class="icon"><use href="#i-trophy"/></svg>Bảng xếp hạng lan toả</h3>
+          <p class="panel-sub" id="lbSub">Đợt tuyển sinh 2026 — xếp theo số bài chia sẻ & lượt click</p>
+          <div id="leaderboardList"><div class="skeleton" style="height:220px;"></div></div>
+        </div>
+        <div class="panel">
+          <h3><svg class="icon"><use href="#i-users"/></svg>Thi đua giữa các khoa</h3>
+          <p class="panel-sub">Tổng số bài chia sẻ của cả khoa trong đợt — khoa của bạn được tô đậm</p>
+          <div id="khoaBoard"><div class="skeleton" style="height:140px;"></div></div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:18px;">
+        <div class="panel">
+          <h3><svg class="icon"><use href="#i-chart"/></svg>Hoạt động 7 ngày qua</h3>
+          <p class="panel-sub">Số bài bạn đã chia sẻ mỗi ngày</p>
+          <div class="chart" id="activityChart"></div>
+        </div>
+        <div class="panel">
+          <h3><svg class="icon"><use href="#i-history"/></svg>Lịch sử chia sẻ gần đây</h3>
+          <p class="panel-sub">10 lượt chia sẻ mới nhất của bạn</p>
+          <div class="timeline" id="historyList"><div class="skeleton" style="height:140px;"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== MODAL ===================== -->
+<div class="modal-backdrop" id="modalBackdrop">
+  <div class="modal">
+    <div class="modal-cover" id="modalCover">
+      <img id="modalCoverImg" src="" alt="">
+      <div class="cover-shade"></div>
+      <span class="cover-label" id="modalCoverLabel" style="position:relative;z-index:1;">—</span>
+      <button class="modal-close" id="modalCloseBtn"><svg class="icon"><use href="#i-x"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <h2 class="modal-title" id="modalTitle">—</h2>
+      <div class="modal-meta" id="modalMeta">—</div>
+      <div class="modal-reason"><svg class="icon"><use href="#i-lightbulb"/></svg><span id="modalReason">—</span></div>
+
+      <div class="tone-row">
+        <span class="tone-label">Kênh:</span>
+        <button class="channel-chip active" data-channel="facebook">Facebook</button>
+        <button class="channel-chip" data-channel="zalo">Zalo</button>
+        <button class="channel-chip" data-channel="tiktok">Kịch bản TikTok</button>
+      </div>
+      <div class="tone-row">
+        <span class="tone-label">Giọng văn:</span>
+        <button class="tone-chip active" data-tone="than_thien">Thân thiện</button>
+        <button class="tone-chip" data-tone="chuyen_nghiep">Chuyên nghiệp</button>
+        <button class="tone-chip" data-tone="truyen_cam_hung">Truyền cảm hứng</button>
+        <button class="btn ai-rewrite" id="aiRewriteBtn" style="margin-left:auto;padding:9px 15px;font-size:12.5px;">
+          <svg class="icon"><use href="#i-sparkles"/></svg>AI viết lại theo giọng của tôi
+        </button>
+      </div>
+
+      <textarea class="caption-box" id="captionBox" spellcheck="false"></textarea>
+      <div class="ai-source-note" id="aiSourceNote"></div>
+
+      <div class="modal-actions">
+        <button class="btn btn-ghost" id="copyBtn"><svg class="icon"><use href="#i-copy"/></svg>Sao chép</button>
+        <button class="btn btn-ghost" id="posterBtn"><svg class="icon"><use href="#i-hash"/></svg>Poster QR</button>
+        <button class="btn btn-primary" id="shareBtn"><svg class="icon"><use href="#i-share"/></svg>Chia sẻ ngay lên Facebook</button>
+      </div>
+      <p class="utm-note"><svg class="icon"><use href="#i-shield"/></svg><span>Khi bấm chia sẻ: caption được <b>tự động sao chép</b> để bạn dán vào Facebook (Facebook không cho ứng dụng điền sẵn nội dung), và hệ thống gắn <b>link UTM định danh</b> — mọi lượt click từ bài của bạn được tính vào thành tích cá nhân.</span></p>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== SHARE STEP OVERLAY ===================== -->
+<div class="modal-backdrop" id="stepBackdrop">
+  <div class="modal" style="max-width:490px;">
+    <div class="modal-body" style="padding:26px 28px;position:relative;">
+      <button class="modal-close" id="stepCloseBtn" style="background:#F1EFF3;color:var(--muted);"><svg class="icon"><use href="#i-x"/></svg></button>
+      <h2 class="modal-title" id="stepTitle" style="margin-bottom:16px;">Đã ghi nhận lượt chia sẻ!</h2>
+
+      <div class="step-row">
+        <span class="step-ic done"><svg class="icon"><use href="#i-check"/></svg></span>
+        <span>Lượt chia sẻ đã được tính vào thành tích và gắn <b>link UTM định danh</b> của bạn.</span>
+      </div>
+      <div class="step-row" id="stepCopyRow">
+        <span class="step-ic done"><svg class="icon"><use href="#i-check"/></svg></span>
+        <span>Caption đã được <b>sao chép sẵn vào clipboard</b>.</span>
+      </div>
+      <div class="step-row">
+        <span class="step-ic todo">3</span>
+        <span>Bấm nút bên dưới — cửa sổ Facebook mở ra, <b>dán (Ctrl+V)</b> vào ô "Hãy nói gì đó về nội dung này..." rồi bấm Đăng.</span>
+      </div>
+
+      <div class="fb-policy-note">
+        <svg class="icon"><use href="#i-shield"/></svg>
+        <span>Facebook không cho phép ứng dụng điền sẵn nội dung bài viết (chính sách chống spam áp dụng cho mọi nền tảng), vì vậy bước dán thủ công là bắt buộc — caption đã được chuẩn bị sẵn cho bạn.</span>
+      </div>
+
+      <div class="mini-caption" id="stepCaption"></div>
+
+      <div class="modal-actions" style="margin-top:0;">
+        <button class="btn btn-ghost" id="stepCopyAgain"><svg class="icon"><use href="#i-copy"/></svg>Sao chép lại</button>
+        <button class="btn btn-primary" id="stepOpenFb"><svg class="icon"><use href="#i-share"/></svg>Mở Facebook để dán & đăng</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<canvas id="confettiCanvas"></canvas>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ==================================================================
+   CỔNG CHIA SẺ NỘI DUNG — Đại học Duy Tân
+   Kết nối API backend thật (Flask + SQLite) — không có dữ liệu cứng.
+   ================================================================== */
+const API_BASE = window.DTU_API_BASE || "http://localhost:8000/api";
+const DOT = "Đợt tuyển sinh 2026";
+
+let authToken = null;
+let currentTeacher = null;
+let myStats = null;
+let suggestions = [];
+let seasonInfo = null;
+let modalPost = null;
+let selectedTone = "than_thien";
+
+const $ = id => document.getElementById(id);
+const icon = (name, cls = "icon") => `<svg class="${cls}"><use href="#i-${name}"/></svg>`;
+
+/* ---------- Helpers ---------- */
+async function apiFetch(path, options = {}) {
+  const headers = Object.assign({ "Content-Type": "application/json" }, options.headers || {});
+  if (authToken) headers["Authorization"] = "Bearer " + authToken;
+  const res = await fetch(API_BASE + path, Object.assign({}, options, { headers }));
+  if (res.status === 401) { showLogin("Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại."); throw new Error("401"); }
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || "Lỗi máy chủ");
+  return data;
+}
+
+function showToast(msg, success = false) {
+  const t = $("toast");
+  t.textContent = msg;
+  t.classList.toggle("success", success);
+  t.classList.add("show");
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(() => t.classList.remove("show"), 3200);
+}
+
+/* Ảnh bìa theo ngành/chủ đề — bộ SVG thiết kế riêng trong assets/covers/ */
+const COVER_BY_NGANH = {
+  "CNTT": "cntt", "Công nghệ thông tin": "cntt",
+  "Y Dược": "yduoc", "Kinh tế": "kinhte", "Kiến trúc": "kientruc",
+  "Du lịch": "dulich", "Ngôn ngữ": "ngonngu", "Toàn trường": "toantruong",
+};
+function coverFor(post) {
+  if (/học bổng/i.test(post.chu_de || "")) return "hocbong";
+  if (post.giai_doan === "Sự kiện thường niên") return "sukien";
+  if (post.giai_doan === "Mùa nhập học") return "nhaphoc";
+  return COVER_BY_NGANH[post.nganh] || "toantruong";
+}
+const coverSrc = post => `../assets/covers/${coverFor(post)}.svg`;
+
+const SEASON_ICON = {
+  huong_nghiep: "compass", mua_thi: "book", cao_diem_xet_tuyen: "flame",
+  nhap_hoc: "clipboard", gan_ket: "users",
+};
+const TIER_ICON = { bronze: "award", silver: "award", gold: "award", diamond: "gem" };
+const AVATAR_COLORS = ["#C8393F","#6D28D9","#0E7A5F","#B4520F","#4338CA","#8E2DA8","#0E6BA8","#5C6470"];
+
+function timeAgo(iso) {
+  const then = new Date(iso.replace(" ", "T"));
+  const diff = (Date.now() - then.getTime()) / 1000;
+  if (diff < 3600) return Math.max(1, Math.round(diff / 60)) + " phút trước";
+  if (diff < 86400) return Math.round(diff / 3600) + " giờ trước";
+  if (diff < 86400 * 30) return Math.round(diff / 86400) + " ngày trước";
+  return then.toLocaleDateString("vi-VN");
+}
+
+function animateNumber(el, target, suffix = "") {
+  // Đếm số bằng setInterval (không dùng rAF để vẫn chạy khi tab bị trình duyệt tiết chế)
+  const steps = 24, duration = 700;
+  let i = 0;
+  clearInterval(el._anim);
+  el._anim = setInterval(() => {
+    i++;
+    const p = i / steps;
+    el.textContent = Math.round(target * (1 - Math.pow(1 - p, 3))) + suffix;
+    if (i >= steps) { clearInterval(el._anim); el.textContent = target + suffix; }
+  }, duration / steps);
+}
+
+/* ---------- Login ---------- */
+function showLogin(msg) {
+  $("appRoot").style.display = "none";
+  $("loginOverlay").style.display = "flex";
+  if (msg) $("loginError").textContent = msg;
+}
+function showApp() {
+  $("loginOverlay").style.display = "none";
+  $("appRoot").style.display = "block";
+}
+
+async function handleLogin() {
+  const email = $("loginEmail").value.trim();
+  const mat_khau = $("loginPassword").value;
+  const errorEl = $("loginError");
+  const btn = $("loginBtn");
+  errorEl.textContent = "";
+  if (!email || !mat_khau) { errorEl.textContent = "Vui lòng nhập đầy đủ email và mật khẩu."; return; }
+  btn.disabled = true; btn.textContent = "Đang đăng nhập...";
+  try {
+    const res = await fetch(API_BASE + "/auth/login", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, mat_khau }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Đăng nhập thất bại");
+    authToken = data.token;
+    currentTeacher = data.user;
+    showApp();
+    initDashboard();
+  } catch (err) {
+    errorEl.textContent = err.message;
+  } finally {
+    btn.disabled = false; btn.textContent = "Đăng nhập";
+  }
+}
+$("loginBtn").addEventListener("click", handleLogin);
+$("loginPassword").addEventListener("keydown", e => { if (e.key === "Enter") handleLogin(); });
+$("demoFillBtn").addEventListener("click", () => {
+  $("loginEmail").value = "nguyenvana@duytan.edu.vn";
+  $("loginPassword").value = "DemoPass123!";
+  handleLogin();
+});
+$("logoutBtn").addEventListener("click", () => {
+  authToken = null; currentTeacher = null;
+  showLogin("");
+  $("loginError").textContent = "";
+});
+
+/* ---------- Header & greeting ---------- */
+function renderHeader() {
+  $("teacherNameLabel").textContent = currentTeacher.ho_ten;
+  $("avatarInitial").textContent = currentTeacher.ho_ten.split(" ").slice(-1)[0].slice(0, 2).toUpperCase();
+  const h = new Date().getHours();
+  const buoi = h < 12 ? "Chào buổi sáng" : h < 18 ? "Chào buổi chiều" : "Chào buổi tối";
+  const tenNgan = currentTeacher.ho_ten.replace(/^(ThS|TS|PGS|GS|CN|PGS\.TS)\.\s*/i, "");
+  $("greetingText").textContent = `${buoi}, ${tenNgan}`;
+  $("todayText").textContent = new Date().toLocaleDateString("vi-VN", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+}
+
+/* ---------- Season & suggestions ---------- */
+async function loadSuggestions() {
+  const data = await apiFetch("/content/goi-y-mua-vu?limit=6");
+  seasonInfo = data.mua_vu;
+  suggestions = data.goi_y;
+
+  $("seasonIcon").innerHTML = icon(SEASON_ICON[seasonInfo.key] || "flame");
+  $("seasonName").textContent = seasonInfo.ten;
+  $("seasonDesc").textContent = seasonInfo.mo_ta;
+  $("seasonGoldenHour").style.display = "inline-flex";
+  $("seasonGoldenHour").querySelector("span:last-child").textContent = "Khung giờ vàng: " + seasonInfo.khung_gio_vang;
+  $("seasonHashtag").style.display = "inline-flex";
+  $("seasonHashtag").querySelector("span:last-child").textContent = seasonInfo.hashtag;
+  $("suggestNote").textContent = `Chấm điểm theo ${seasonInfo.ten} · cập nhật ${new Date().toLocaleTimeString("vi-VN", {hour:"2-digit",minute:"2-digit"})}`;
+
+  const grid = $("suggestGrid");
+  if (!suggestions.length) {
+    grid.innerHTML = '<div class="empty-hint">Chưa có bài nào được duyệt để đề xuất — liên hệ phòng Truyền thông.</div>';
+    return;
+  }
+  grid.innerHTML = suggestions.map((s, i) => `
+    <div class="suggest-card" data-index="${i}">
+      <div class="suggest-cover">
+        <img src="${coverSrc(s)}" alt="${s.nganh}" loading="lazy">
+        <div class="cover-shade"></div>
+        <span class="score-pill">${icon("sparkles")}Phù hợp ${s.diem_phu_hop}%</span>
+        <span class="cover-label">${s.giai_doan}</span>
+      </div>
+      <div class="suggest-body">
+        <h4 class="suggest-title">${s.chu_de}</h4>
+        <div class="suggest-meta">${s.nganh} · dự kiến ${new Date(s.ngay_dang_du_kien).toLocaleDateString("vi-VN")}</div>
+        <div class="suggest-reason">${icon("lightbulb")}<span>${s.ly_do_goi_y}</span></div>
+      </div>
+      <div class="suggest-foot">
+        <button class="btn btn-primary btn-block">Xem & chia sẻ ${icon("arrow-right")}</button>
+      </div>
+    </div>`).join("");
+  grid.querySelectorAll(".suggest-card").forEach(card => {
+    card.addEventListener("click", () => openModal(suggestions[+card.dataset.index]));
+  });
+}
+
+/* ---------- Stats ---------- */
+async function loadStats() {
+  myStats = await apiFetch("/teachers/toi/thong-ke?dot_truyen_thong=" + encodeURIComponent(DOT));
+  const s = myStats;
+  const target = s.target;
+
+  // Ring
+  const circumference = 163.4;
+  const pct = Math.min(s.so_bai_dot_nay / target, 1);
+  requestAnimationFrame(() => { $("ringFill").style.strokeDashoffset = circumference * (1 - pct); });
+  $("ringLabel").textContent = `${s.so_bai_dot_nay}/${target}`;
+  $("statShared").textContent = `${s.so_bai_dot_nay}/${target} bài`;
+  const remain = Math.max(target - s.so_bai_dot_nay, 0);
+  $("statSharedSub").textContent = remain === 0 ? "Đã hoàn thành chỉ tiêu đợt này!" : `Còn ${remain} bài nữa để hoàn thành`;
+
+  animateNumber($("statClicks"), s.luot_click_dot_nay);
+
+  const tier = s.cap_bac;
+  $("statTier").innerHTML = `<span class="tier-badge tier-${tier.class}">${icon(TIER_ICON[tier.class] || "award")}${tier.label}</span>`;
+  $("tierEmblem").innerHTML = icon(TIER_ICON[tier.class] || "award");
+  $("tierEmblem").className = "stat-emblem emblem-tier-" + tier.class;
+  $("statTierSub").textContent = `Tổng lũy kế ${s.tong_luy_ke} bài chia sẻ`;
+
+  $("statRank").textContent = s.hang ? `#${s.hang}` : "—";
+  $("statRankSub").textContent = `trong ${s.tong_giang_vien} giảng viên toàn trường`;
+
+  $("teacherTierLabel").textContent = `Hạng ${tier.label} · #${s.hang || "—"} toàn trường`;
+
+  renderActivityChart(s.hoat_dong_7_ngay);
+  renderHistory(s.lich_su);
+  renderBadges(s.huy_hieu);
+}
+
+function renderBadges(badges) {
+  if (!badges || !badges.length) return;
+  $("badgeGrid").innerHTML = badges.map(b => {
+    // Thanh tiến độ cho huy hiệu chưa đạt (tien_do dạng "x/y")
+    let bar = "";
+    const m = /^(\d+)\/(\d+)$/.exec(b.tien_do || "");
+    if (!b.dat && m) {
+      const pct = Math.min(100, Math.round(+m[1] / +m[2] * 100));
+      bar = `<div class="b-bar"><i style="width:${pct}%"></i></div>`;
+    }
+    return `
+    <div class="badge-card ${b.dat ? "unlocked" : "locked"}" title="${b.mo_ta}">
+      ${b.dat ? `<span class="b-check">${icon("check")}</span>` : ""}
+      <div class="b-ic">${icon(b.icon)}</div>
+      <div class="b-name">${b.ten}</div>
+      <div class="b-progress">${b.dat ? "Đã đạt" : b.tien_do}</div>
+      ${bar}
+    </div>`;
+  }).join("");
+}
+
+function renderActivityChart(activity) {
+  const map = {};
+  (activity || []).forEach(a => { map[a.ngay] = a.so_luot; });
+  const days = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    const key = d.toISOString().slice(0, 10);
+    days.push({ key, label: ["CN","T2","T3","T4","T5","T6","T7"][d.getDay()], val: map[key] || 0 });
+  }
+  const max = Math.max(1, ...days.map(d => d.val));
+  $("activityChart").innerHTML = days.map(d => `
+    <div class="col">
+      <div class="val">${d.val || ""}</div>
+      <div class="bar ${d.val === 0 ? "zero" : ""}" style="height:${Math.max(5, d.val / max * 100)}%"></div>
+      <div class="day">${d.label}</div>
+    </div>`).join("");
+}
+
+function renderHistory(history) {
+  const list = $("historyList");
+  if (!history || !history.length) {
+    list.innerHTML = '<div class="empty-hint">Chưa có lượt chia sẻ nào — bắt đầu với bài AI đề xuất phía trên nhé!</div>';
+    return;
+  }
+  list.innerHTML = history.map(h => `
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-body">
+        <div class="tl-title">${h.chu_de}${h.luot_click ? `<span class="tl-clicks">${icon("link")}${h.luot_click} click</span>` : ""}</div>
+        <div class="tl-meta">${timeAgo(h.thoi_gian)} · ${h.dot_truyen_thong}</div>
+      </div>
+    </div>`).join("");
+}
+
+/* ---------- Leaderboard ---------- */
+async function loadLeaderboard() {
+  const data = await apiFetch("/teachers/bang-xep-hang?dot_truyen_thong=" + encodeURIComponent(DOT));
+  const board = data.bang_xep_hang.slice(0, 10);
+  $("leaderboardList").innerHTML = board.map((t, i) => {
+    const initials = t.ho_ten.split(" ").slice(-1)[0].slice(0, 2).toUpperCase();
+    const color = AVATAR_COLORS[t.id % AVATAR_COLORS.length];
+    const rankCls = i === 0 ? "rank-1" : i === 1 ? "rank-2" : i === 2 ? "rank-3" : "";
+    return `
+    <div class="lb-row ${t.la_toi ? "me" : ""}">
+      <div class="rank-badge ${rankCls}">${t.hang}</div>
+      <div class="lb-avatar" style="background:${color}">${initials}</div>
+      <div class="lb-info">
+        <div class="lb-name">${t.ho_ten}${t.la_toi ? '<span class="you">BẠN</span>' : ""}</div>
+        <div class="lb-khoa">${t.khoa} · <span class="tier-badge tier-${t.cap_bac.class}" style="padding:1px 8px;font-size:10.5px;">${t.cap_bac.label}</span></div>
+      </div>
+      <div class="lb-stats">
+        <div class="lb-count">${t.so_bai} bài</div>
+        <div class="lb-clicks">${t.luot_click} click</div>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+/* ---------- Thi đua giữa các khoa ---------- */
+async function loadKhoaBoard() {
+  const data = await apiFetch("/teachers/bang-xep-hang-khoa?dot_truyen_thong=" + encodeURIComponent(DOT));
+  const board = data.bang_xep_hang;
+  const max = Math.max(1, ...board.map(k => k.so_bai));
+  $("khoaBoard").innerHTML = board.map(k => `
+    <div class="khoa-row ${k.khoa === data.khoa_cua_toi ? "me" : ""}">
+      <div class="k-name">${k.hang}. ${k.khoa}</div>
+      <div class="k-track"><div class="k-fill" style="width:${Math.max(k.so_bai / max * 100, 8)}%">${k.so_bai}</div></div>
+      <div class="k-clicks">${k.luot_click} click</div>
+    </div>`).join("");
+}
+
+/* ---------- Đa kênh phân phối (Facebook / Zalo / TikTok) ---------- */
+let selectedChannel = "facebook";
+let channelCache = {};
+
+document.querySelectorAll(".channel-chip").forEach(chip => {
+  chip.addEventListener("click", async () => {
+    if (!modalPost) return;
+    const channel = chip.dataset.channel;
+    if (channel === selectedChannel) return;
+    // Lưu lại bản Facebook đang soạn (kể cả sau khi AI viết lại) trước khi chuyển kênh
+    if (selectedChannel === "facebook") channelCache.facebook = $("captionBox").value;
+    if (!channelCache.zalo) {
+      chip.textContent = "Đang soạn...";
+      try {
+        const data = await apiFetch(`/content/${modalPost.id}/da-kenh`, { method: "POST", body: "{}" });
+        channelCache.zalo = data.zalo;
+        channelCache.tiktok = data.tiktok;
+      } catch (err) { showToast("Lỗi: " + err.message); }
+      chip.textContent = channel === "zalo" ? "Zalo" : "Kịch bản TikTok";
+    }
+    selectedChannel = channel;
+    document.querySelectorAll(".channel-chip").forEach(c => c.classList.toggle("active", c === chip));
+    $("captionBox").value = channelCache[channel] || "";
+    // Giọng văn AI chỉ áp dụng cho bản Facebook
+    $("aiRewriteBtn").disabled = channel !== "facebook";
+    $("aiSourceNote").textContent = channel === "facebook" ? ""
+      : (channel === "zalo" ? "Bản rút gọn cho tin nhắn Zalo — sao chép để gửi nhóm phụ huynh/học sinh."
+                             : "Kịch bản video 30 giây — dùng khi quay TikTok/Reels.");
+  });
+});
+
+/* ---------- Poster QR cá nhân ---------- */
+$("posterBtn").addEventListener("click", () => {
+  if (!modalPost || !currentTeacher) return;
+  const ma = currentTeacher.ma_giang_vien || "GV";
+  const baseLink = modalPost.link_bai_dang || `https://facebook.com/duytanuniversity/posts/${modalPost.id}`;
+  const qrData = `${baseLink}?utm_source=poster&utm_medium=qr&utm_campaign=${encodeURIComponent(DOT)}&utm_content=${ma}`;
+  const qrImg = `https://api.qrserver.com/v1/create-qr-code/?size=280x280&margin=10&data=${encodeURIComponent(qrData)}`;
+  const cover = new URL(coverSrc(modalPost), location.href).href;
+  const w = window.open("", "_blank");
+  if (!w) { showToast("Trình duyệt đang chặn cửa sổ mới — hãy cho phép popup cho trang này rồi thử lại."); return; }
+  w.document.write(`<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8">
+    <title>Poster QR — ${modalPost.chu_de}</title>
+    <style>
+      body{margin:0;font-family:'Segoe UI',system-ui,sans-serif;background:#EFEEF1;}
+      .poster{width:620px;margin:20px auto;background:#fff;box-shadow:0 12px 40px rgba(0,0,0,.15);}
+      .cover{height:300px;overflow:hidden;}.cover img{width:100%;height:100%;object-fit:cover;display:block;}
+      .body{padding:34px 40px 30px;text-align:center;}
+      h1{font-size:26px;margin:0 0 8px;color:#1C1B1F;line-height:1.3;}
+      .meta{color:#77767B;font-size:14px;margin-bottom:22px;}
+      .qr{width:220px;height:220px;border:1px solid #E6E4E6;border-radius:14px;padding:10px;}
+      .qr-fallback{font-size:12px;color:#77767B;word-break:break-all;border:1px dashed #E6E4E6;border-radius:10px;padding:12px;margin-top:8px;display:none;}
+      .scan{font-weight:700;color:#C8393F;margin:16px 0 4px;font-size:16px;}
+      .gv{font-size:13px;color:#4A4A4E;}
+      .foot{background:#1C1B1F;color:#fff;padding:14px;text-align:center;font-size:12px;letter-spacing:2px;border-top:4px solid #C8393F;}
+      .print-btn{display:block;margin:16px auto;border:none;background:#C8393F;color:#fff;border-radius:10px;padding:12px 26px;font-size:14px;font-weight:700;cursor:pointer;}
+      @media print{body{background:#fff;}.poster{box-shadow:none;margin:0;width:100%;}.print-btn{display:none;}}
+    </style></head><body>
+    <div class="poster">
+      <div class="cover"><img src="${cover}" alt=""></div>
+      <div class="body">
+        <h1>${modalPost.chu_de}</h1>
+        <div class="meta">${modalPost.nganh} · Tuyển sinh 2026 · Đại học Duy Tân</div>
+        <img class="qr" src="${qrImg}" alt="QR" onerror="this.style.display='none';document.querySelector('.qr-fallback').style.display='block';">
+        <div class="qr-fallback">Quét không được? Truy cập: ${qrData}</div>
+        <div class="scan">📱 Quét mã để xem chi tiết & đăng ký tư vấn</div>
+        <div class="gv">Người giới thiệu: ${currentTeacher.ho_ten} — ${currentTeacher.khoa} (mã ${ma})</div>
+      </div>
+      <div class="foot">ĐẠI HỌC DUY TÂN · TUYENSINH.DUYTAN.EDU.VN</div>
+    </div>
+    <button class="print-btn" onclick="window.print()">🖨 In poster / Lưu PDF</button>
+    </body></html>`);
+  w.document.close();
+  showToast("Đã tạo poster QR — in và dán tại lớp học, mọi lượt quét đều tính cho bạn.", true);
+});
+
+/* ---------- Modal ---------- */
+function openModal(post) {
+  modalPost = post;
+  selectedTone = "than_thien";
+  selectedChannel = "facebook";
+  channelCache = {};
+  $("aiRewriteBtn").disabled = false;
+  document.querySelectorAll(".channel-chip").forEach(c => c.classList.toggle("active", c.dataset.channel === "facebook"));
+  document.querySelectorAll(".tone-chip").forEach(c => c.classList.toggle("active", c.dataset.tone === "than_thien"));
+  $("modalCoverImg").src = coverSrc(post);
+  $("modalCoverLabel").textContent = post.giai_doan + " · Phù hợp " + post.diem_phu_hop + "%";
+  $("modalTitle").textContent = post.chu_de;
+  $("modalMeta").textContent = `${post.nganh} · dự kiến đăng ${new Date(post.ngay_dang_du_kien).toLocaleDateString("vi-VN")}`;
+  $("modalReason").textContent = post.ly_do_goi_y;
+  $("captionBox").value = post.caption_cuoi || `${post.chu_de} — thông tin dành cho ngành ${post.nganh}.`;
+  $("aiSourceNote").textContent = "";
+  const done = myStats && myStats.so_bai_dot_nay >= myStats.target;
+  $("shareBtn").disabled = false;
+  $("shareBtn").innerHTML = icon("share") + (done ? "Chia sẻ thêm (đã đạt chỉ tiêu)" : "Chia sẻ ngay lên Facebook");
+  $("modalBackdrop").classList.add("open");
+  document.body.style.overflow = "hidden";
+}
+function closeModal() {
+  $("modalBackdrop").classList.remove("open");
+  document.body.style.overflow = "";
+}
+$("modalCloseBtn").addEventListener("click", closeModal);
+$("modalBackdrop").addEventListener("click", e => { if (e.target === $("modalBackdrop")) closeModal(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape") closeModal(); });
+
+document.querySelectorAll(".tone-chip").forEach(chip => {
+  chip.addEventListener("click", () => {
+    selectedTone = chip.dataset.tone;
+    document.querySelectorAll(".tone-chip").forEach(c => c.classList.toggle("active", c === chip));
+  });
+});
+
+$("aiRewriteBtn").addEventListener("click", async () => {
+  if (!modalPost) return;
+  const btn = $("aiRewriteBtn");
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> AI đang viết...';
+  try {
+    const data = await apiFetch(`/content/${modalPost.id}/caption-ca-nhan`, {
+      method: "POST",
+      body: JSON.stringify({ giong_van: selectedTone }),
+    });
+    // Hiệu ứng gõ chữ nhẹ khi thay caption (setInterval để không bị tiết chế như rAF)
+    const box = $("captionBox");
+    const text = data.caption;
+    let i = 0;
+    const step = Math.max(2, Math.round(text.length / 50));
+    clearInterval(box._typing);
+    box._typing = setInterval(() => {
+      i += step;
+      box.value = text.slice(0, i);
+      if (i >= text.length) { clearInterval(box._typing); box.value = text; }
+    }, 16);
+    $("aiSourceNote").textContent = data.source === "ai"
+      ? "Caption do Claude AI viết theo giọng văn bạn chọn — bạn có thể sửa trực tiếp."
+      : "Caption được cá nhân hoá tự động (chế độ demo offline) — bạn có thể sửa trực tiếp.";
+  } catch (err) {
+    showToast("Lỗi AI: " + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = icon("sparkles") + "AI viết lại theo giọng của tôi";
+  }
+});
+
+$("copyBtn").addEventListener("click", async () => {
+  try {
+    await navigator.clipboard.writeText($("captionBox").value);
+    showToast("Đã sao chép caption vào clipboard", true);
+  } catch { showToast("Không sao chép được — hãy bôi đen và copy thủ công."); }
+});
+
+/* ---------- Share ----------
+   Facebook KHÔNG cho phép ứng dụng điền sẵn nội dung bài viết (chính sách chống spam),
+   nên luồng chuẩn (giống các nền tảng employee advocacy thật) là:
+   sao chép caption vào clipboard → mở hộp thoại chia sẻ → người dùng dán Ctrl+V. */
+let pendingShare = null; // {url, caption}
+
+$("shareBtn").addEventListener("click", async () => {
+  if (!modalPost) return;
+  const btn = $("shareBtn");
+  btn.disabled = true;
+  const caption = $("captionBox").value;
+  const wasDone = myStats && myStats.so_bai_dot_nay >= myStats.target;
+
+  // Sao chép ngay trong cú click để không mất quyền clipboard (user gesture)
+  let copied = true;
+  try { await navigator.clipboard.writeText(caption); } catch { copied = false; }
+
+  try {
+    const result = await apiFetch("/teachers/chia-se", {
+      method: "POST",
+      body: JSON.stringify({
+        dot_truyen_thong: DOT,
+        link_bai_dang: modalPost.link_bai_dang || `https://facebook.com/duytanuniversity/posts/${modalPost.id}`,
+        lich_noi_dung_id: modalPost.id,
+      }),
+    });
+    pendingShare = {
+      url: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(result.utm_link)}`,
+      caption,
+    };
+    closeModal();
+
+    // Mở overlay hướng dẫn 2 bước
+    $("stepTitle").textContent = `Đã ghi nhận lượt chia sẻ thứ ${result.so_bai_da_chia_se}!`;
+    $("stepCaption").textContent = caption;
+    $("stepCopyRow").innerHTML = copied
+      ? `<span class="step-ic done"><svg class="icon"><use href="#i-check"/></svg></span>
+         <span>Caption đã được <b>sao chép sẵn vào clipboard</b>.</span>`
+      : `<span class="step-ic todo">2</span>
+         <span>Bấm <b>"Sao chép lại"</b> bên dưới để lấy caption vào clipboard.</span>`;
+    $("stepBackdrop").classList.add("open");
+    document.body.style.overflow = "hidden";
+
+    await Promise.all([loadStats(), loadLeaderboard()]);
+    if (result.hoan_thanh && !wasDone) launchConfetti();
+  } catch (err) {
+    showToast("Lỗi: " + err.message);
+  } finally {
+    btn.disabled = false;
+  }
+});
+
+function closeStepOverlay() {
+  $("stepBackdrop").classList.remove("open");
+  document.body.style.overflow = "";
+}
+$("stepCloseBtn").addEventListener("click", closeStepOverlay);
+$("stepBackdrop").addEventListener("click", e => { if (e.target === $("stepBackdrop")) closeStepOverlay(); });
+
+$("stepOpenFb").addEventListener("click", () => {
+  if (!pendingShare) return;
+  // Mở đồng bộ trong cú click để không bị trình duyệt chặn popup
+  window.open(pendingShare.url, "_blank", "width=580,height=560");
+  showToast("Đã mở Facebook — dán (Ctrl+V) caption rồi bấm Đăng nhé!", true);
+});
+
+$("stepCopyAgain").addEventListener("click", async () => {
+  if (!pendingShare) return;
+  try {
+    await navigator.clipboard.writeText(pendingShare.caption);
+    showToast("Đã sao chép caption vào clipboard", true);
+  } catch { showToast("Không sao chép được — hãy bôi đen phần caption và copy thủ công."); }
+});
+
+/* ---------- Confetti ---------- */
+function launchConfetti() {
+  const canvas = $("confettiCanvas");
+  const ctx = canvas.getContext("2d");
+  canvas.width = innerWidth; canvas.height = innerHeight;
+  const colors = ["#C8393F", "#F0A93B", "#3FBF8F", "#7C6AF0", "#D65DB1", "#FFD166"];
+  const parts = Array.from({ length: 160 }, () => ({
+    x: Math.random() * canvas.width,
+    y: -20 - Math.random() * canvas.height * 0.4,
+    w: 7 + Math.random() * 6,
+    h: 10 + Math.random() * 8,
+    vy: 2.2 + Math.random() * 3.4,
+    vx: -1.6 + Math.random() * 3.2,
+    rot: Math.random() * Math.PI,
+    vr: -0.12 + Math.random() * 0.24,
+    color: colors[Math.floor(Math.random() * colors.length)],
+  }));
+  const start = performance.now();
+  (function frame(now) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    parts.forEach(p => {
+      p.x += p.vx; p.y += p.vy; p.rot += p.vr; p.vy += 0.03;
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+      ctx.restore();
+    });
+    if (now - start < 3800) requestAnimationFrame(frame);
+    else ctx.clearRect(0, 0, canvas.width, canvas.height);
+  })(start);
+}
+
+/* ---------- Init ---------- */
+async function initDashboard() {
+  renderHeader();
+  try {
+    await Promise.all([loadSuggestions(), loadStats(), loadLeaderboard(), loadKhoaBoard()]);
+  } catch (err) {
+    if (err.message !== "401") showToast("Không tải được dữ liệu: " + err.message);
+  }
+}
+
+showLogin();
+</script>
+</body>
+</html>

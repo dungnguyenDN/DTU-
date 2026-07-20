@@ -1,0 +1,172 @@
+{
+  "name": "01 - Soạn, duyệt và đăng nội dung",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": { "interval": [ { "field": "cronExpression", "expression": "0 8 * * *" } ] }
+      },
+      "id": "trigger-schedule",
+      "name": "Mỗi ngày 8:00 sáng",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [ -80, 0 ]
+    },
+    {
+      "parameters": {
+        "operation": "read",
+        "documentId": { "__rl": true, "value": "REPLACE_WITH_GOOGLE_SHEET_ID", "mode": "id" },
+        "sheetName": { "__rl": true, "value": "LichNoiDung", "mode": "name" },
+        "filtersUI": {
+          "values": [
+            { "lookupColumn": "TrangThai", "lookupValue": "Chờ soạn" },
+            { "lookupColumn": "NgayDangDuKien", "lookupValue": "={{ $today.format('yyyy-MM-dd') }}" }
+          ]
+        }
+      },
+      "id": "read-sheet",
+      "name": "Đọc lịch nội dung hôm nay",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [ 140, 0 ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.anthropic.com/v1/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "anthropic-version", "value": "2023-06-01" },
+            { "name": "content-type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: \"claude-sonnet-4-6\", max_tokens: 400, messages: [ { role: \"user\", content: `Bạn là biên tập viên truyền thông tuyển sinh của Đại học Duy Tân. Hãy soạn 1 caption Facebook (dưới 120 từ, có 2-3 hashtag phù hợp) cho nội dung sau:\\nChủ đề: ${$json.ChuDe}\\nGiai đoạn mùa vụ: ${$json.GiaiDoan}\\nNgành: ${$json.Nganh}\\nGhi chú thêm: ${$json.GhiChu}\\nChỉ trả về đúng phần caption, không giải thích thêm.` } ] }) }}"
+      },
+      "id": "ai-draft",
+      "name": "AI soạn nháp caption",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [ 360, 0 ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            { "name": "caption_nhap", "type": "string", "value": "={{ $json.content[0].text }}" },
+            { "name": "resume_url", "type": "string", "value": "={{ $execution.resumeUrl }}" }
+          ]
+        }
+      },
+      "id": "set-caption",
+      "name": "Chuẩn bị dữ liệu duyệt",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [ 580, 0 ]
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": { "__rl": true, "value": "REPLACE_WITH_SLACK_CHANNEL_ID", "mode": "id" },
+        "text": "=📝 *Bài chờ duyệt - {{ $('Đọc lịch nội dung hôm nay').item.json.Nganh }}*\n\n{{ $json.caption_nhap }}\n\n✅ Duyệt & đăng ngay: {{ $json.resume_url }}"
+      },
+      "id": "slack-approve",
+      "name": "Gửi Slack chờ duyệt",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [ 800, 0 ]
+    },
+    {
+      "parameters": {
+        "resume": "webhook",
+        "options": { "webhookSuffix": "=/duyet-{{ $('Đọc lịch nội dung hôm nay').item.json.ID }}" }
+      },
+      "id": "wait-approval",
+      "name": "Chờ cán bộ truyền thông duyệt",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [ 1020, 0 ],
+      "webhookId": "REPLACE_AFTER_FIRST_SAVE"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v19.0/REPLACE_WITH_PAGE_ID/feed",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "message", "value": "={{ $('Chuẩn bị dữ liệu duyệt').item.json.caption_nhap }}" },
+            { "name": "access_token", "value": "REPLACE_WITH_PAGE_ACCESS_TOKEN" }
+          ]
+        }
+      },
+      "id": "post-facebook",
+      "name": "Đăng lên Fanpage",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [ 1240, 0 ]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": { "__rl": true, "value": "REPLACE_WITH_GOOGLE_SHEET_ID", "mode": "id" },
+        "sheetName": { "__rl": true, "value": "LichNoiDung", "mode": "name" },
+        "columns": {
+          "matchingColumns": [ "ID" ],
+          "value": {
+            "ID": "={{ $('Đọc lịch nội dung hôm nay').item.json.ID }}",
+            "TrangThai": "Đã đăng",
+            "LinkBaiDang": "={{ 'https://facebook.com/' + $json.id }}",
+            "CaptionCuoi": "={{ $('Chuẩn bị dữ liệu duyệt').item.json.caption_nhap }}"
+          }
+        }
+      },
+      "id": "update-sheet",
+      "name": "Cập nhật trạng thái đã đăng",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [ 1460, 0 ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://REPLACE_WITH_N8N_HOST/webhook/teacher-suggestion-update",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ post_link: 'https://facebook.com/' + $('Đăng lên Fanpage').item.json.id, caption: $('Chuẩn bị dữ liệu duyệt').item.json.caption_nhap, nganh: $('Đọc lịch nội dung hôm nay').item.json.Nganh }) }}"
+      },
+      "id": "notify-portal",
+      "name": "Báo cho Cổng chia sẻ (Luồng 2)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [ 1680, 0 ]
+    },
+    {
+      "parameters": {
+        "content": "## Thiết lập trước khi chạy\n1. Tạo Google Sheet với tab `LichNoiDung`, cột: ID, NgayDangDuKien, GiaiDoan, ChuDe, Nganh, GhiChu, TrangThai, LinkBaiDang, CaptionCuoi\n2. Thêm credential Google Sheets OAuth2, Slack OAuth2, HTTP Header Auth (Anthropic: header `x-api-key`) trong n8n\n3. Thay các giá trị `REPLACE_WITH_...` bằng ID/token thật\n4. Sau khi lưu workflow lần đầu, copy webhookId thật của node Wait vào lại node đó",
+        "height": 340,
+        "width": 380
+      },
+      "id": "note-1",
+      "name": "Ghi chú thiết lập",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [ -80, -280 ]
+    }
+  ],
+  "connections": {
+    "Mỗi ngày 8:00 sáng": { "main": [ [ { "node": "Đọc lịch nội dung hôm nay", "type": "main", "index": 0 } ] ] },
+    "Đọc lịch nội dung hôm nay": { "main": [ [ { "node": "AI soạn nháp caption", "type": "main", "index": 0 } ] ] },
+    "AI soạn nháp caption": { "main": [ [ { "node": "Chuẩn bị dữ liệu duyệt", "type": "main", "index": 0 } ] ] },
+    "Chuẩn bị dữ liệu duyệt": { "main": [ [ { "node": "Gửi Slack chờ duyệt", "type": "main", "index": 0 } ] ] },
+    "Gửi Slack chờ duyệt": { "main": [ [ { "node": "Chờ cán bộ truyền thông duyệt", "type": "main", "index": 0 } ] ] },
+    "Chờ cán bộ truyền thông duyệt": { "main": [ [ { "node": "Đăng lên Fanpage", "type": "main", "index": 0 } ] ] },
+    "Đăng lên Fanpage": { "main": [ [ { "node": "Cập nhật trạng thái đã đăng", "type": "main", "index": 0 } ] ] },
+    "Cập nhật trạng thái đã đăng": { "main": [ [ { "node": "Báo cho Cổng chia sẻ (Luồng 2)", "type": "main", "index": 0 } ] ] }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" }
+}

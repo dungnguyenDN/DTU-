@@ -1,0 +1,135 @@
+{
+  "name": "03 - Thu thập và tổng hợp KPI",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": { "interval": [ { "field": "cronExpression", "expression": "0 23 * * *" } ] }
+      },
+      "id": "trigger-daily",
+      "name": "Mỗi ngày 23:00",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [ -80, 0 ]
+    },
+    {
+      "parameters": {
+        "operation": "read",
+        "documentId": { "__rl": true, "value": "REPLACE_WITH_GOOGLE_SHEET_ID", "mode": "id" },
+        "sheetName": { "__rl": true, "value": "LichNoiDung", "mode": "name" },
+        "filtersUI": { "values": [ { "lookupColumn": "TrangThai", "lookupValue": "Đã đăng" } ] }
+      },
+      "id": "get-posts",
+      "name": "Lấy danh sách bài đã đăng",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [ 140, 0 ]
+    },
+    {
+      "parameters": { "batchSize": 10, "options": {} },
+      "id": "split-batches",
+      "name": "Chia batch gọi API",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [ 360, 0 ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "=https://graph.facebook.com/v19.0/{{ $json.LinkBaiDang.split('/').pop() }}/insights",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "metric", "value": "post_impressions,post_engaged_users,post_clicks" },
+            { "name": "access_token", "value": "REPLACE_WITH_PAGE_ACCESS_TOKEN" }
+          ]
+        }
+      },
+      "id": "fb-insights",
+      "name": "Lấy Facebook Insights",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [ 580, 0 ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $json.data || [];\nconst metric = name => (data.find(d => d.name === name)?.values?.[0]?.value) || 0;\nconst impressions = metric('post_impressions');\nconst engaged = metric('post_engaged_users');\nconst clicks = metric('post_clicks');\nconst engagementRate = impressions ? +(engaged / impressions * 100).toFixed(2) : 0;\nreturn [{ json: { impressions, engaged, clicks, engagementRate } }];"
+      },
+      "id": "calc-kpi",
+      "name": "Tính engagement rate",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [ 800, 0 ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": { "__rl": true, "value": "REPLACE_WITH_GOOGLE_SHEET_ID", "mode": "id" },
+        "sheetName": { "__rl": true, "value": "KpiDashboard", "mode": "name" },
+        "columns": {
+          "value": {
+            "Ngay": "={{ $now.format('yyyy-MM-dd') }}",
+            "BaiDang": "={{ $('Lấy danh sách bài đã đăng').item.json.LinkBaiDang }}",
+            "Nganh": "={{ $('Lấy danh sách bài đã đăng').item.json.Nganh }}",
+            "LuotXem": "={{ $json.impressions }}",
+            "LuotTuongTac": "={{ $json.engaged }}",
+            "LuotClick": "={{ $json.clicks }}",
+            "TyLeTuongTac": "={{ $json.engagementRate }}"
+          }
+        }
+      },
+      "id": "append-kpi",
+      "name": "Ghi vào KpiDashboard",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [ 1020, 0 ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [ { "leftValue": "={{ $now.format('EEEE') }}", "rightValue": "Monday", "operator": { "type": "string", "operation": "equals" } } ]
+        }
+      },
+      "id": "if-monday",
+      "name": "Là thứ Hai?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [ 1240, 0 ]
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": { "__rl": true, "value": "REPLACE_WITH_SLACK_CHANNEL_ID", "mode": "id" },
+        "text": "=📊 Báo cáo KPI truyền thông tuần trước đã được cập nhật vào KpiDashboard. Xem chi tiết tại Google Sheet / Looker Studio."
+      },
+      "id": "slack-report",
+      "name": "Gửi báo cáo tuần",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [ 1460, -100 ]
+    },
+    {
+      "parameters": {
+        "content": "## Thiết lập trước khi chạy\n1. Tạo tab `KpiDashboard` (Ngay, BaiDang, Nganh, LuotXem, LuotTuongTac, LuotClick, TyLeTuongTac)\n2. Kết nối Google Sheet này với Looker Studio để có dashboard trực quan\n3. Node Facebook Insights cần Page Access Token có quyền `read_insights`",
+        "height": 220,
+        "width": 380
+      },
+      "id": "note-3",
+      "name": "Ghi chú thiết lập",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [ -80, -240 ]
+    }
+  ],
+  "connections": {
+    "Mỗi ngày 23:00": { "main": [ [ { "node": "Lấy danh sách bài đã đăng", "type": "main", "index": 0 } ] ] },
+    "Lấy danh sách bài đã đăng": { "main": [ [ { "node": "Chia batch gọi API", "type": "main", "index": 0 } ] ] },
+    "Chia batch gọi API": { "main": [ [ { "node": "Lấy Facebook Insights", "type": "main", "index": 0 } ] ] },
+    "Lấy Facebook Insights": { "main": [ [ { "node": "Tính engagement rate", "type": "main", "index": 0 } ] ] },
+    "Tính engagement rate": { "main": [ [ { "node": "Ghi vào KpiDashboard", "type": "main", "index": 0 } ] ] },
+    "Ghi vào KpiDashboard": { "main": [ [ { "node": "Chia batch gọi API", "type": "main", "index": 0 }, { "node": "Là thứ Hai?", "type": "main", "index": 0 } ] ] },
+    "Là thứ Hai?": { "main": [ [ { "node": "Gửi báo cáo tuần", "type": "main", "index": 0 } ], [] ] }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" }
+}

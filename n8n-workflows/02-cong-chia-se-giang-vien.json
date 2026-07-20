@@ -1,0 +1,179 @@
+{
+  "name": "02 - Cổng chia sẻ giảng viên (ghi nhận + nhắc nhở)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "teacher-share",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-share",
+      "name": "Webhook: Giảng viên bấm Chia sẻ ngay",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [ -80, 0 ],
+      "webhookId": "REPLACE_AFTER_FIRST_SAVE"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": { "__rl": true, "value": "REPLACE_WITH_GOOGLE_SHEET_ID", "mode": "id" },
+        "sheetName": { "__rl": true, "value": "ShareLog", "mode": "name" },
+        "columns": {
+          "value": {
+            "ThoiGian": "={{ $now.toISO() }}",
+            "GiangVienId": "={{ $json.body.teacher_id }}",
+            "GiangVien": "={{ $json.body.teacher_name }}",
+            "DotTruyenThong": "={{ $json.body.campaign_period }}",
+            "LinkBaiDang": "={{ $json.body.post_link }}",
+            "UtmLink": "={{ $json.body.utm_link }}"
+          }
+        }
+      },
+      "id": "log-share",
+      "name": "Ghi log lượt chia sẻ",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [ 140, 0 ]
+    },
+    {
+      "parameters": {
+        "operation": "read",
+        "documentId": { "__rl": true, "value": "REPLACE_WITH_GOOGLE_SHEET_ID", "mode": "id" },
+        "sheetName": { "__rl": true, "value": "ShareLog", "mode": "name" },
+        "filtersUI": {
+          "values": [
+            { "lookupColumn": "GiangVienId", "lookupValue": "={{ $('Webhook: Giảng viên bấm Chia sẻ ngay').item.json.body.teacher_id }}" },
+            { "lookupColumn": "DotTruyenThong", "lookupValue": "={{ $('Webhook: Giảng viên bấm Chia sẻ ngay').item.json.body.campaign_period }}" }
+          ]
+        }
+      },
+      "id": "count-shares",
+      "name": "Đếm số bài đã chia sẻ trong đợt",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [ 360, 0 ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const rows = $input.all();\nconst target = 5;\nconst count = rows.length;\nreturn [{ json: { count, target, completed: count >= target } }];"
+      },
+      "id": "code-progress",
+      "name": "Tính tiến độ 5 bài",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [ 580, 0 ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [ { "leftValue": "={{ $json.completed }}", "rightValue": true, "operator": { "type": "boolean", "operation": "true" } } ]
+        }
+      },
+      "id": "if-completed",
+      "name": "Đã đủ 5 bài?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [ 800, 0 ]
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": { "__rl": true, "value": "REPLACE_WITH_SLACK_CHANNEL_ID", "mode": "id" },
+        "text": "=🎉 {{ $('Webhook: Giảng viên bấm Chia sẻ ngay').item.json.body.teacher_name }} đã hoàn thành chỉ tiêu 5 bài chia sẻ trong đợt {{ $('Webhook: Giảng viên bấm Chia sẻ ngay').item.json.body.campaign_period }}!"
+      },
+      "id": "slack-congrats",
+      "name": "Thông báo hoàn thành chỉ tiêu",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [ 1020, -100 ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ ok: true, count: $json.count, target: $json.target }) }}"
+      },
+      "id": "respond-progress",
+      "name": "Trả tiến độ về Cổng chia sẻ",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.2,
+      "position": [ 1020, 100 ]
+    },
+    {
+      "parameters": {
+        "rule": { "interval": [ { "field": "cronExpression", "expression": "0 9 * * 5" } ] }
+      },
+      "id": "trigger-reminder",
+      "name": "Mỗi thứ 6, 9:00 sáng",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [ -80, 320 ]
+    },
+    {
+      "parameters": {
+        "operation": "read",
+        "documentId": { "__rl": true, "value": "REPLACE_WITH_GOOGLE_SHEET_ID", "mode": "id" },
+        "sheetName": { "__rl": true, "value": "DanhSachGiangVien", "mode": "name" }
+      },
+      "id": "get-teachers",
+      "name": "Lấy danh sách giảng viên",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [ 140, 320 ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Với mỗi giảng viên, đối chiếu ShareLog để tìm người chưa đạt 5 bài.\n// Trong triển khai thật: gọi Google Sheets node lấy toàn bộ ShareLog rồi group theo GiangVienId ở đây.\nreturn $input.all().filter(item => (item.json.SoBaiDaChia || 0) < 5);"
+      },
+      "id": "filter-incomplete",
+      "name": "Lọc giảng viên chưa đạt chỉ tiêu",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [ 360, 320 ]
+    },
+    {
+      "parameters": {
+        "fromEmail": "truyenthong@duytan.edu.vn",
+        "toEmail": "={{ $json.Email }}",
+        "subject": "Nhắc nhở: hoàn thành chỉ tiêu chia sẻ bài tuần này",
+        "html": "=Chào {{ $json.HoTen }},<br><br>Tuần này bạn còn {{ 5 - ($json.SoBaiDaChia || 0) }} bài chưa chia sẻ để đủ chỉ tiêu 5 bài. Vào Cổng chia sẻ nội dung và bấm \"Chia sẻ ngay\" chỉ mất 1 phút.<br><br>Trân trọng."
+      },
+      "id": "send-reminder",
+      "name": "Gửi email nhắc nhở",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [ 580, 320 ]
+    },
+    {
+      "parameters": {
+        "content": "## Thiết lập trước khi chạy\n1. Tạo tab `ShareLog` (ThoiGian, GiangVienId, GiangVien, DotTruyenThong, LinkBaiDang, UtmLink) và tab `DanhSachGiangVien` (HoTen, Email, GiangVienId, SoBaiDaChia)\n2. Webhook path `/teacher-share` chính là endpoint mà portal (index.html) gọi tới khi bấm \"Chia sẻ ngay\"\n3. Nhánh dưới (thứ 6 hàng tuần) tự động nhắc email cho giảng viên chưa đạt chỉ tiêu",
+        "height": 260,
+        "width": 380
+      },
+      "id": "note-2",
+      "name": "Ghi chú thiết lập",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [ -80, -240 ]
+    }
+  ],
+  "connections": {
+    "Webhook: Giảng viên bấm Chia sẻ ngay": { "main": [ [ { "node": "Ghi log lượt chia sẻ", "type": "main", "index": 0 } ] ] },
+    "Ghi log lượt chia sẻ": { "main": [ [ { "node": "Đếm số bài đã chia sẻ trong đợt", "type": "main", "index": 0 } ] ] },
+    "Đếm số bài đã chia sẻ trong đợt": { "main": [ [ { "node": "Tính tiến độ 5 bài", "type": "main", "index": 0 } ] ] },
+    "Tính tiến độ 5 bài": { "main": [ [ { "node": "Đã đủ 5 bài?", "type": "main", "index": 0 } ] ] },
+    "Đã đủ 5 bài?": {
+      "main": [
+        [ { "node": "Thông báo hoàn thành chỉ tiêu", "type": "main", "index": 0 }, { "node": "Trả tiến độ về Cổng chia sẻ", "type": "main", "index": 0 } ],
+        [ { "node": "Trả tiến độ về Cổng chia sẻ", "type": "main", "index": 0 } ]
+      ]
+    },
+    "Mỗi thứ 6, 9:00 sáng": { "main": [ [ { "node": "Lấy danh sách giảng viên", "type": "main", "index": 0 } ] ] },
+    "Lấy danh sách giảng viên": { "main": [ [ { "node": "Lọc giảng viên chưa đạt chỉ tiêu", "type": "main", "index": 0 } ] ] },
+    "Lọc giảng viên chưa đạt chỉ tiêu": { "main": [ [ { "node": "Gửi email nhắc nhở", "type": "main", "index": 0 } ] ] }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" }
+}

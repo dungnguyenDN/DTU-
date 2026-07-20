@@ -1,0 +1,155 @@
+{
+  "name": "04 - Chatbot AI thời gian thực",
+  "nodes": [
+    {
+      "parameters": { "httpMethod": "POST", "path": "chatbot", "responseMode": "responseNode", "options": {} },
+      "id": "webhook-chat",
+      "name": "Webhook: Tin nhắn từ Messenger/Website",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [ -80, 0 ],
+      "webhookId": "REPLACE_AFTER_FIRST_SAVE"
+    },
+    {
+      "parameters": {
+        "operation": "read",
+        "documentId": { "__rl": true, "value": "REPLACE_WITH_GOOGLE_SHEET_ID", "mode": "id" },
+        "sheetName": { "__rl": true, "value": "FAQ", "mode": "name" }
+      },
+      "id": "get-faq",
+      "name": "Lấy cơ sở tri thức FAQ",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [ 140, 0 ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const question = $('Webhook: Tin nhắn từ Messenger/Website').first().json.body.message.toLowerCase();\nconst faqRows = $input.all().map(i => i.json);\nconst scored = faqRows.map(row => {\n  const kw = (row.TuKhoa || '').toLowerCase().split(',').map(s => s.trim());\n  const hits = kw.filter(k => k && question.includes(k)).length;\n  return { row, hits };\n}).filter(x => x.hits > 0).sort((a, b) => b.hits - a.hits);\nconst context = scored.slice(0, 3).map(x => `- ${x.row.CauHoi}: ${x.row.CauTraLoi}`).join('\\n');\nreturn [{ json: { question, context: context || 'Không tìm thấy FAQ liên quan.' } }];"
+      },
+      "id": "match-faq",
+      "name": "Tìm FAQ liên quan (keyword match)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [ 360, 0 ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.anthropic.com/v1/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "anthropic-version", "value": "2023-06-01" },
+            { "name": "content-type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: \"claude-sonnet-4-6\", max_tokens: 300, system: \"Bạn là trợ lý tư vấn tuyển sinh của Đại học Duy Tân. Chỉ trả lời dựa trên ngữ cảnh FAQ được cung cấp. Nếu không đủ thông tin để trả lời chắc chắn, hoặc câu hỏi nhạy cảm/ngoài phạm vi tuyển sinh, trả về đúng chuỗi: HANDOFF. Trả lời ngắn gọn, thân thiện, dưới 80 từ.\", messages: [ { role: \"user\", content: `Ngữ cảnh FAQ:\\n${$json.context}\\n\\nCâu hỏi của thí sinh: ${$json.question}` } ] }) }}"
+      },
+      "id": "ai-answer",
+      "name": "AI sinh câu trả lời",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [ 580, 0 ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [ { "leftValue": "={{ $json.content[0].text }}", "rightValue": "HANDOFF", "operator": { "type": "string", "operation": "equals" } } ]
+        }
+      },
+      "id": "if-handoff",
+      "name": "Cần chuyển tư vấn viên?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [ 800, 0 ]
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": { "__rl": true, "value": "REPLACE_WITH_SLACK_CHANNEL_ID", "mode": "id" },
+        "text": "=⚠️ Có câu hỏi cần tư vấn viên hỗ trợ trực tiếp: \"{{ $('Tìm FAQ liên quan (keyword match)').item.json.question }}\""
+      },
+      "id": "slack-handoff",
+      "name": "Báo tư vấn viên trực",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [ 1020, -120 ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ reply: \"Câu hỏi này cần tư vấn viên hỗ trợ trực tiếp, đội ngũ tuyển sinh sẽ phản hồi bạn trong ít phút.\" }) }}"
+      },
+      "id": "respond-handoff",
+      "name": "Trả lời tạm thời (chờ tư vấn viên)",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.2,
+      "position": [ 1240, -120 ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ reply: $json.content[0].text }) }}"
+      },
+      "id": "respond-ai",
+      "name": "Trả lời tự động",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.2,
+      "position": [ 1020, 120 ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": { "__rl": true, "value": "REPLACE_WITH_GOOGLE_SHEET_ID", "mode": "id" },
+        "sheetName": { "__rl": true, "value": "ChatLog", "mode": "name" },
+        "columns": {
+          "value": {
+            "ThoiGian": "={{ $now.toISO() }}",
+            "CauHoi": "={{ $('Tìm FAQ liên quan (keyword match)').item.json.question }}",
+            "CauTraLoi": "={{ $json.content ? $json.content[0].text : 'HANDOFF' }}",
+            "ChuyenTuVanVien": "={{ $json.content ? ($json.content[0].text === 'HANDOFF') : true }}"
+          }
+        }
+      },
+      "id": "log-chat",
+      "name": "Lưu log câu hỏi (gợi ý nội dung Luồng 1)",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [ 1240, 120 ]
+    },
+    {
+      "parameters": {
+        "content": "## Thiết lập trước khi chạy\n1. Tạo tab `FAQ` (CauHoi, CauTraLoi, TuKhoa) và tab `ChatLog` (ThoiGian, CauHoi, CauTraLoi, ChuyenTuVanVien)\n2. Webhook `/chatbot` nhận payload dạng { message, sender_id } - map từ Messenger Webhook/website widget\n3. `ChatLog` chính là dữ liệu để rà soát chủ đề hot mỗi tuần, đưa vào lịch nội dung ở Luồng 1",
+        "height": 240,
+        "width": 380
+      },
+      "id": "note-4",
+      "name": "Ghi chú thiết lập",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [ -80, -260 ]
+    }
+  ],
+  "connections": {
+    "Webhook: Tin nhắn từ Messenger/Website": { "main": [ [ { "node": "Lấy cơ sở tri thức FAQ", "type": "main", "index": 0 } ] ] },
+    "Lấy cơ sở tri thức FAQ": { "main": [ [ { "node": "Tìm FAQ liên quan (keyword match)", "type": "main", "index": 0 } ] ] },
+    "Tìm FAQ liên quan (keyword match)": { "main": [ [ { "node": "AI sinh câu trả lời", "type": "main", "index": 0 } ] ] },
+    "AI sinh câu trả lời": { "main": [ [ { "node": "Cần chuyển tư vấn viên?", "type": "main", "index": 0 } ] ] },
+    "Cần chuyển tư vấn viên?": {
+      "main": [
+        [ { "node": "Báo tư vấn viên trực", "type": "main", "index": 0 } ],
+        [ { "node": "Trả lời tự động", "type": "main", "index": 0 } ]
+      ]
+    },
+    "Báo tư vấn viên trực": { "main": [ [ { "node": "Trả lời tạm thời (chờ tư vấn viên)", "type": "main", "index": 0 } ] ] },
+    "Trả lời tạm thời (chờ tư vấn viên)": { "main": [ [ { "node": "Lưu log câu hỏi (gợi ý nội dung Luồng 1)", "type": "main", "index": 0 } ] ] },
+    "Trả lời tự động": { "main": [ [ { "node": "Lưu log câu hỏi (gợi ý nội dung Luồng 1)", "type": "main", "index": 0 } ] ] }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" }
+}

@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tuyển sinh 2026 — Đại học Duy Tân</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#201F22; --ink-soft:#4A4A4E; --red:#C8393F; --red-dark:#A82E33; --red-tint:#FBEAEA;
+    --bg:#FFFFFF; --bg-soft:#F6F5F6; --text:#201F22; --muted:#77767B; --line:#E6E4E6;
+    --success:#1E7A4C; --gray-tint:#F0EFF1;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0;font-family:'Inter',system-ui,sans-serif;color:var(--text);background:var(--bg);}
+
+  /* ===== Header ===== */
+  .header{
+    position:sticky;top:0;z-index:40;background:rgba(255,255,255,.94);backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);
+  }
+  .header-inner{
+    max-width:1080px;margin:0 auto;padding:14px 20px;
+    display:flex;align-items:center;justify-content:space-between;gap:16px;
+  }
+  .header img{height:34px;display:block;}
+  .nav{display:flex;gap:22px;align-items:center;}
+  .nav a{color:var(--ink-soft);text-decoration:none;font-size:13.5px;font-weight:600;}
+  .nav a:hover{color:var(--red);}
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    border:none;border-radius:10px;padding:11px 20px;font-size:14px;font-weight:700;
+    font-family:'Inter',sans-serif;cursor:pointer;text-decoration:none;
+    transition:transform .12s ease,opacity .12s ease;
+  }
+  .btn:active{transform:scale(.98);}
+  .btn-red{background:var(--red);color:#fff;box-shadow:0 6px 18px rgba(200,57,63,.28);}
+  .btn-red:hover{opacity:.93;}
+  .btn-outline{background:transparent;border:1.5px solid var(--line);color:var(--ink);}
+  .btn-outline:hover{border-color:var(--red);color:var(--red);}
+  @media (max-width:720px){.nav a{display:none;}}
+
+  /* ===== Hero ===== */
+  .hero{background:linear-gradient(175deg,var(--bg) 55%,var(--red-tint) 130%);}
+  .hero-inner{max-width:1080px;margin:0 auto;padding:72px 20px 64px;text-align:center;}
+  .hero .eyebrow{
+    display:inline-block;background:var(--red-tint);color:var(--red-dark);
+    font-size:12.5px;font-weight:800;letter-spacing:.6px;padding:7px 16px;border-radius:999px;margin-bottom:22px;
+  }
+  .hero h1{
+    font-family:'Manrope',sans-serif;font-weight:800;font-size:clamp(30px,5.5vw,52px);
+    line-height:1.12;margin:0 0 18px;letter-spacing:-.5px;
+  }
+  .hero h1 em{font-style:normal;color:var(--red);}
+  .hero p{color:var(--muted);font-size:16.5px;line-height:1.65;max-width:560px;margin:0 auto 30px;}
+  .hero-ctas{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+  .hero-note{margin-top:16px;font-size:12.5px;color:var(--muted);}
+  .hero-note b{color:var(--success);}
+
+  /* ===== Sections ===== */
+  section{max-width:1080px;margin:0 auto;padding:56px 20px;}
+  .section-head{margin-bottom:28px;}
+  .section-head h2{font-family:'Manrope',sans-serif;font-size:26px;font-weight:800;margin:0 0 6px;}
+  .section-head p{color:var(--muted);font-size:14.5px;margin:0;}
+
+  /* ===== Icon system ===== */
+  svg.icon{
+    width:18px;height:18px;flex-shrink:0;
+    stroke:currentColor;fill:none;stroke-width:2;
+    stroke-linecap:round;stroke-linejoin:round;
+    display:inline-block;vertical-align:-3px;
+  }
+
+  /* ===== Stats band ===== */
+  .stats-band{
+    max-width:1080px;margin:-8px auto 0;padding:0 20px 8px;
+    display:grid;grid-template-columns:repeat(4,1fr);gap:14px;
+  }
+  @media (max-width:720px){.stats-band{grid-template-columns:repeat(2,1fr);}}
+  .sb-item{
+    background:var(--bg);border:1px solid var(--line);border-radius:16px;
+    padding:18px 20px;text-align:center;box-shadow:0 4px 18px rgba(32,31,34,.05);
+  }
+  .sb-item .v{font-family:'Manrope',sans-serif;font-weight:800;font-size:24px;color:var(--red);}
+  .sb-item .l{font-size:12px;color:var(--muted);margin-top:4px;font-weight:600;}
+
+  /* ===== Majors showcase ===== */
+  .major-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px;}
+  .major-card{
+    border:1px solid var(--line);border-radius:18px;background:var(--bg);overflow:hidden;
+    transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;cursor:pointer;
+    display:flex;flex-direction:column;
+  }
+  .major-card:hover{transform:translateY(-4px);border-color:var(--red);box-shadow:0 16px 40px rgba(32,31,34,.12);}
+  .major-card:hover .major-cover img{transform:scale(1.06);}
+  .major-cover{height:148px;position:relative;overflow:hidden;background:#1B1A21;}
+  .major-cover img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s ease;}
+  .major-cover .badge{
+    position:absolute;top:12px;left:12px;
+    background:rgba(18,16,20,.55);backdrop-filter:blur(6px);
+    border:1px solid rgba(255,255,255,.25);color:#fff;
+    border-radius:999px;padding:4px 12px;font-size:11px;font-weight:700;letter-spacing:.4px;
+  }
+  .major-body{padding:16px 18px 18px;display:flex;flex-direction:column;gap:9px;flex:1;}
+  .major-body h3{font-family:'Manrope',sans-serif;font-size:16.5px;margin:0;}
+  .major-body p{font-size:12.5px;color:var(--muted);margin:0;line-height:1.6;flex:1;}
+  .major-tags{display:flex;gap:6px;flex-wrap:wrap;}
+  .major-tags span{
+    font-size:10.5px;font-weight:700;color:var(--ink-soft);
+    background:var(--gray-tint);border-radius:999px;padding:4px 10px;
+  }
+  .major-cta{
+    display:inline-flex;align-items:center;gap:6px;
+    color:var(--red);font-size:12.5px;font-weight:700;margin-top:2px;
+  }
+  .major-cta svg.icon{width:14px;height:14px;transition:transform .15s ease;}
+  .major-card:hover .major-cta svg.icon{transform:translateX(3px);}
+
+  .news-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;}
+  .news-card{
+    position:relative;border:1px solid var(--line);border-radius:16px;padding:0;background:var(--bg);
+    cursor:pointer;overflow:hidden;transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;
+    animation:newsIn .45s ease both;
+  }
+  .news-card:hover{transform:translateY(-3px);box-shadow:0 14px 32px rgba(32,31,34,.1);border-color:var(--red);}
+  .news-card:hover .cover img{transform:scale(1.05);}
+  .news-card .cover{
+    height:140px;position:relative;overflow:hidden;background:#1B1A21;
+  }
+  .news-card .cover img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s ease;}
+  .news-card .body{padding:16px 18px 18px;}
+  .news-card .tag{
+    display:inline-block;font-size:11px;font-weight:800;letter-spacing:.3px;
+    background:var(--gray-tint);color:var(--ink-soft);padding:4px 10px;border-radius:999px;margin-bottom:10px;
+  }
+  .news-card h3{font-family:'Manrope',sans-serif;font-size:15.5px;margin:0 0 8px;line-height:1.4;}
+  .news-card .meta{font-size:12px;color:var(--muted);display:flex;align-items:center;justify-content:space-between;gap:8px;}
+  .news-card .read-more{color:var(--red);font-weight:700;font-size:12px;white-space:nowrap;}
+  .news-card.featured{grid-column:1 / -1;display:grid;grid-template-columns:300px 1fr;}
+  .news-card.featured .cover{height:100%;min-height:180px;}
+  .news-card.featured .body{padding:22px 24px;}
+  .news-card.featured h3{font-size:20px;}
+  @media (max-width:640px){.news-card.featured{grid-template-columns:1fr;}.news-card.featured .cover{height:140px;min-height:0;}}
+  .news-empty{color:var(--muted);font-size:13.5px;border:1px dashed var(--line);border-radius:14px;padding:22px;text-align:center;}
+  @keyframes newsIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+
+  /* ===== News detail modal ===== */
+  .modal-overlay{
+    position:fixed;inset:0;background:rgba(32,31,34,.5);z-index:80;
+    display:none;align-items:flex-start;justify-content:center;padding:5vh 20px;overflow-y:auto;
+  }
+  .modal-overlay.open{display:flex;}
+  .modal-card{
+    background:var(--bg);border-radius:20px;max-width:720px;width:100%;
+    box-shadow:0 30px 80px rgba(32,31,34,.3);animation:modalIn .2s ease both;
+  }
+  @keyframes modalIn{from{opacity:0;transform:translateY(12px) scale(.98);}to{opacity:1;transform:none;}}
+  .modal-cover{
+    height:250px;border-radius:20px 20px 0 0;overflow:hidden;
+    background:#1B1A21;position:relative;
+  }
+  .modal-cover img{width:100%;height:100%;object-fit:cover;display:block;}
+  .modal-close{
+    position:absolute;top:14px;right:14px;width:34px;height:34px;border-radius:50%;border:none;
+    background:rgba(255,255,255,.9);color:var(--ink);font-size:16px;cursor:pointer;
+    box-shadow:0 4px 14px rgba(0,0,0,.25);
+  }
+  .modal-body{padding:28px 36px 34px;}
+  @media (max-width:560px){.modal-body{padding:22px 20px 26px;}}
+  .article-kicker{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px;}
+  .article-kicker .tag{
+    display:inline-block;font-size:11px;font-weight:800;letter-spacing:.4px;
+    background:var(--red);color:#fff;padding:5px 12px;border-radius:999px;
+  }
+  .article-kicker .kmeta{font-size:12px;color:var(--muted);font-weight:600;}
+  .modal-body h2{font-family:'Manrope',sans-serif;font-size:26px;margin:0 0 14px;line-height:1.3;letter-spacing:-.3px;}
+  .article-author{
+    display:flex;align-items:center;gap:10px;padding-bottom:18px;margin-bottom:20px;
+    border-bottom:1px solid var(--line);
+  }
+  .article-author .a-avatar{
+    width:36px;height:36px;border-radius:50%;flex-shrink:0;
+    background:linear-gradient(135deg,var(--red),#E8734A);color:#fff;
+    display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;
+  }
+  .article-author .a-name{font-size:13px;font-weight:700;}
+  .article-author .a-role{font-size:11.5px;color:var(--muted);}
+  .article-lead{
+    font-size:16px;font-weight:600;line-height:1.7;color:var(--ink);margin:0 0 16px;
+  }
+  .article-paras p{font-size:14.5px;line-height:1.85;color:var(--ink-soft);margin:0 0 16px;}
+  .article-fig{margin:22px 0;}
+  .article-fig img{width:100%;border-radius:14px;display:block;box-shadow:0 12px 32px rgba(32,31,34,.12);}
+  .article-fig figcaption{font-size:12px;color:var(--muted);text-align:center;margin-top:9px;font-style:italic;}
+  .article-quote{
+    margin:22px 0;padding:16px 20px 16px 24px;position:relative;
+    background:var(--red-tint);border-left:4px solid var(--red);border-radius:0 14px 14px 0;
+    font-size:15px;line-height:1.7;font-weight:600;color:var(--ink);font-style:italic;
+  }
+  .article-tags{display:flex;gap:8px;flex-wrap:wrap;margin:22px 0 0;}
+  .article-tags span{
+    font-size:12px;font-weight:700;color:var(--red);background:var(--red-tint);
+    border-radius:999px;padding:6px 14px;
+  }
+  .article-cta{
+    margin-top:24px;padding:18px 20px;border-radius:16px;
+    background:linear-gradient(120deg,#211F26,#4E2027);color:#fff;
+    display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;
+  }
+  .article-cta .c-t1{font-family:'Manrope',sans-serif;font-weight:800;font-size:14.5px;}
+  .article-cta .c-t2{font-size:12px;opacity:.75;margin-top:3px;}
+
+  /* ===== Footer ===== */
+  footer{border-top:1px solid var(--line);background:var(--bg-soft);}
+  .footer-inner{max-width:1080px;margin:0 auto;padding:28px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+  .footer-inner img{height:26px;opacity:.9;}
+  .footer-inner p{font-size:12px;color:var(--muted);margin:0;}
+
+  /* ===== Chat widget ===== */
+  .chat-fab{
+    position:fixed;right:22px;bottom:22px;z-index:60;
+    width:60px;height:60px;border-radius:50%;border:none;cursor:pointer;
+    background:var(--red);color:#fff;font-size:24px;
+    box-shadow:0 10px 30px rgba(200,57,63,.4);
+    display:flex;align-items:center;justify-content:center;
+    transition:transform .15s ease;
+  }
+  .chat-fab:hover{transform:scale(1.06);}
+  .chat-fab .badge{
+    position:absolute;top:-4px;right:-4px;background:var(--success);color:#fff;
+    font-size:9px;font-weight:800;padding:3px 7px;border-radius:999px;letter-spacing:.3px;
+  }
+
+  .chat-panel{
+    position:fixed;right:22px;bottom:96px;z-index:60;
+    width:min(380px, calc(100vw - 32px));height:min(560px, calc(100vh - 130px));
+    background:var(--bg);border:1px solid var(--line);border-radius:18px;
+    box-shadow:0 24px 70px rgba(32,31,34,.22);
+    display:none;flex-direction:column;overflow:hidden;
+  }
+  .chat-panel.open{display:flex;}
+  .chat-head{
+    background:var(--ink);color:#fff;padding:14px 18px;
+    display:flex;align-items:center;gap:12px;border-bottom:3px solid var(--red);
+  }
+  .chat-head .bot-avatar{
+    width:34px;height:34px;border-radius:50%;background:var(--red);
+    display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;
+  }
+  .chat-head .t1{font-family:'Manrope',sans-serif;font-weight:700;font-size:14px;}
+  .chat-head .t2{font-size:11px;opacity:.75;display:flex;align-items:center;gap:5px;}
+  .chat-head .dot-live{width:7px;height:7px;border-radius:50%;background:#4ADE80;display:inline-block;}
+  .chat-close{margin-left:auto;background:none;border:none;color:#fff;font-size:18px;cursor:pointer;opacity:.7;}
+  .chat-close:hover{opacity:1;}
+
+  .chat-body{flex:1;overflow-y:auto;padding:16px;background:var(--bg-soft);display:flex;flex-direction:column;gap:10px;}
+  .msg{max-width:82%;padding:10px 14px;border-radius:14px;font-size:13.5px;line-height:1.55;white-space:pre-wrap;}
+  .msg.bot{background:var(--bg);border:1px solid var(--line);align-self:flex-start;border-bottom-left-radius:4px;}
+  .msg.user{background:var(--red);color:#fff;align-self:flex-end;border-bottom-right-radius:4px;}
+  .msg .handoff-badge{
+    display:inline-block;margin-top:8px;font-size:10.5px;font-weight:800;
+    background:#F5EEDF;color:#8A6A2E;padding:3px 9px;border-radius:999px;
+  }
+  .lead-form-box input{
+    width:100%;border:1.5px solid var(--line);border-radius:9px;padding:9px 12px;
+    font-size:12.5px;font-family:'Inter',sans-serif;margin-top:8px;
+  }
+  .lead-form-box input:focus{outline:2px solid var(--red);outline-offset:1px;}
+  .lead-form-box button{
+    width:100%;margin-top:10px;border:none;border-radius:9px;background:var(--red);color:#fff;
+    padding:10px;font-weight:700;font-size:12.5px;cursor:pointer;font-family:'Inter',sans-serif;
+  }
+  .lead-form-box button:disabled{opacity:.6;}
+  .lead-form-box .lf-err{color:#C0392B;font-size:11px;min-height:14px;margin-top:5px;}
+  .typing{display:flex;gap:4px;padding:12px 16px;background:var(--bg);border:1px solid var(--line);border-radius:14px;border-bottom-left-radius:4px;align-self:flex-start;}
+  .typing span{width:6px;height:6px;border-radius:50%;background:var(--muted);animation:blink 1.2s infinite;}
+  .typing span:nth-child(2){animation-delay:.2s;}
+  .typing span:nth-child(3){animation-delay:.4s;}
+  @keyframes blink{0%,60%,100%{opacity:.25;}30%{opacity:1;}}
+
+  .chips{display:flex;gap:8px;flex-wrap:wrap;padding:0 16px 10px;background:var(--bg-soft);}
+  .chip{
+    border:1px solid var(--line);background:var(--bg);border-radius:999px;
+    padding:7px 13px;font-size:12px;font-weight:600;color:var(--ink-soft);cursor:pointer;
+  }
+  .chip:hover{border-color:var(--red);color:var(--red);}
+
+  .chat-input-row{display:flex;gap:8px;padding:12px 14px;border-top:1px solid var(--line);background:var(--bg);}
+  .chat-input-row input{
+    flex:1;border:1px solid var(--line);border-radius:10px;padding:11px 14px;
+    font-size:13.5px;font-family:'Inter',sans-serif;
+  }
+  .chat-input-row input:focus{outline:2px solid var(--red);outline-offset:1px;}
+  .chat-send{
+    border:none;border-radius:10px;background:var(--red);color:#fff;
+    width:44px;font-size:16px;cursor:pointer;flex-shrink:0;
+  }
+  .chat-send:disabled{opacity:.5;cursor:default;}
+</style>
+</head>
+<body>
+
+<!-- ===== SVG icon sprite ===== -->
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none;">
+  <symbol id="i-message" viewBox="0 0 24 24"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24"><path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"/><path d="m21.854 2.147-10.94 10.939"/></symbol>
+  <symbol id="i-cap" viewBox="0 0 24 24"><path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"/><path d="M22 10v6"/><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></symbol>
+  <symbol id="i-arrow-right" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></symbol>
+  <symbol id="i-handoff" viewBox="0 0 24 24"><path d="M16 3h5v5"/><path d="M8 3H3v5"/><path d="M21 3l-7.5 7.5"/><path d="M3 21l7.5-7.5"/><path d="M16 21h5v-5"/></symbol>
+</svg>
+
+<header class="header">
+  <div class="header-inner">
+    <img src="../assets/logo.png" alt="Đại học Duy Tân">
+    <nav class="nav">
+      <a href="#nganh">Ngành đào tạo</a>
+      <a href="#tintuc">Tin tuyển sinh</a>
+    </nav>
+    <button class="btn btn-red" onclick="openChat()"><svg class="icon"><use href="#i-message"/></svg>Hỏi đáp tuyển sinh</button>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="hero-inner">
+    <span class="eyebrow">TUYỂN SINH 2026</span>
+    <h1>Chọn đúng ngành,<br>bắt đầu <em>đúng tương lai</em></h1>
+    <p>Trợ lý AI tư vấn tuyển sinh của Đại học Duy Tân trả lời ngay mọi câu hỏi về ngành học, học phí, học bổng và điều kiện xét tuyển — 24/7, không cần chờ đợi.</p>
+    <div class="hero-ctas">
+      <button class="btn btn-red" onclick="openChat()">Hỏi trợ lý AI ngay</button>
+      <a class="btn btn-outline" href="#nganh">Xem ngành đào tạo</a>
+    </div>
+    <div class="hero-note"><b>●</b> Trợ lý đang trực tuyến — phản hồi trong vài giây</div>
+  </div>
+</div>
+
+<div class="stats-band">
+  <div class="sb-item"><div class="v">30+</div><div class="l">Ngành đào tạo</div></div>
+  <div class="sb-item"><div class="v">94%</div><div class="l">SV có việc làm sau 1 năm</div></div>
+  <div class="sb-item"><div class="v">200+</div><div class="l">Doanh nghiệp đối tác</div></div>
+  <div class="sb-item"><div class="v">25.000+</div><div class="l">Sinh viên đang theo học</div></div>
+</div>
+
+<section id="nganh">
+  <div class="section-head">
+    <h2>Ngành đào tạo nổi bật</h2>
+    <p>Bấm vào ngành bất kỳ để hỏi trợ lý AI về ngành đó.</p>
+  </div>
+  <div class="major-grid">
+    <div class="major-card" onclick="askAbout('Ngành Công nghệ thông tin học những gì và cơ hội việc làm ra sao?')">
+      <div class="major-cover"><img src="../assets/covers/cntt.svg" alt="Công nghệ thông tin"><span class="badge">HOT · Điểm chuẩn 18-20</span></div>
+      <div class="major-body">
+        <h3>Công nghệ thông tin</h3>
+        <p>Đào tạo 4 định hướng: Kỹ thuật phần mềm, Khoa học dữ liệu - AI, An toàn thông tin, Mạng máy tính. Dự án thật cùng doanh nghiệp từ năm 3.</p>
+        <div class="major-tags"><span>4 định hướng</span><span>Thực tập hưởng lương</span><span>Phòng lab AI</span></div>
+        <span class="major-cta">Tư vấn ngành này <svg class="icon"><use href="#i-arrow-right"/></svg></span>
+      </div>
+    </div>
+    <div class="major-card" onclick="askAbout('Ngành Y Dược của trường đào tạo thế nào?')">
+      <div class="major-cover"><img src="../assets/covers/yduoc.svg" alt="Y - Dược"><span class="badge">94% có việc làm</span></div>
+      <div class="major-body">
+        <h3>Y - Dược</h3>
+        <p>Thực hành tại bệnh viện và cơ sở y tế đối tác ngay trong chương trình học, giảng viên là bác sĩ đang hành nghề trực tiếp hướng dẫn.</p>
+        <div class="major-tags"><span>Bệnh viện đối tác</span><span>Phòng thực hành chuẩn</span></div>
+        <span class="major-cta">Tư vấn ngành này <svg class="icon"><use href="#i-arrow-right"/></svg></span>
+      </div>
+    </div>
+    <div class="major-card" onclick="askAbout('Ngành Kiến trúc có gì đặc biệt, có được thực tập không?')">
+      <div class="major-cover"><img src="../assets/covers/kientruc.svg" alt="Kiến trúc"><span class="badge">Studio mở xuyên suốt</span></div>
+      <div class="major-body">
+        <h3>Kiến trúc</h3>
+        <p>Đồ án thật từ năm nhất trong xưởng thiết kế mở, kiến trúc sư đang hành nghề đồng hành. Sản phẩm sinh viên từng triển lãm kiến trúc trẻ.</p>
+        <div class="major-tags"><span>Đồ án thực tế</span><span>Mentor kiến trúc sư</span></div>
+        <span class="major-cta">Tư vấn ngành này <svg class="icon"><use href="#i-arrow-right"/></svg></span>
+      </div>
+    </div>
+    <div class="major-card" onclick="askAbout('Ngành Kinh tế - Quản trị của trường thế nào?')">
+      <div class="major-cover"><img src="../assets/covers/kinhte.svg" alt="Kinh tế - Quản trị"><span class="badge">Học kỳ doanh nghiệp</span></div>
+      <div class="major-body">
+        <h3>Kinh tế - Quản trị</h3>
+        <p>"Học kỳ doanh nghiệp" năm 3: tham gia dự án thật từ nghiên cứu thị trường đến đề xuất chiến lược, nhiều sinh viên được giữ lại thực tập hưởng lương.</p>
+        <div class="major-tags"><span>Dự án thật</span><span>200+ đối tác</span></div>
+        <span class="major-cta">Tư vấn ngành này <svg class="icon"><use href="#i-arrow-right"/></svg></span>
+      </div>
+    </div>
+    <div class="major-card" onclick="askAbout('Ngành Du lịch - Khách sạn học gì, ra trường làm gì?')">
+      <div class="major-cover"><img src="../assets/covers/dulich.svg" alt="Du lịch - Khách sạn"><span class="badge">Khách sạn 4-5★</span></div>
+      <div class="major-body">
+        <h3>Du lịch - Khách sạn</h3>
+        <p>Thực hành tại hệ thống khách sạn 4-5 sao đối tác tại Đà Nẵng từ năm 2, luân phiên qua lễ tân, buồng phòng, ẩm thực và tổ chức sự kiện.</p>
+        <div class="major-tags"><span>Thực hành năm 2</span><span>Đối tác 4-5 sao</span></div>
+        <span class="major-cta">Tư vấn ngành này <svg class="icon"><use href="#i-arrow-right"/></svg></span>
+      </div>
+    </div>
+    <div class="major-card" onclick="askAbout('Ngành Ngôn ngữ của trường có những chuyên ngành nào?')">
+      <div class="major-cover"><img src="../assets/covers/ngonngu.svg" alt="Ngôn ngữ"><span class="badge">4 chuyên ngành</span></div>
+      <div class="major-body">
+        <h3>Ngôn ngữ</h3>
+        <p>Anh, Trung, Hàn, Nhật — giảng viên bản ngữ, chuẩn đầu ra quốc tế, học bổng trao đổi và mạng lưới doanh nghiệp nước ngoài tại Đà Nẵng.</p>
+        <div class="major-tags"><span>GV bản ngữ</span><span>Trao đổi quốc tế</span></div>
+        <span class="major-cta">Tư vấn ngành này <svg class="icon"><use href="#i-arrow-right"/></svg></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="tintuc" style="background:var(--bg-soft);border-radius:24px;">
+  <div class="section-head">
+    <h2>Tin tuyển sinh mới nhất</h2>
+    <p>Cập nhật trực tiếp từ hệ thống truyền thông của trường.</p>
+  </div>
+  <div class="news-grid" id="newsGrid">
+    <div class="news-empty">Đang tải tin mới...</div>
+  </div>
+</section>
+
+<div class="modal-overlay" id="newsModal" onclick="if(event.target===this) closeNewsDetail()">
+  <div class="modal-card">
+    <div class="modal-cover" id="modalCover">
+      <img id="modalCoverImg" src="" alt="">
+      <button class="modal-close" onclick="closeNewsDetail()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="article-kicker">
+        <span class="tag" id="modalTag"></span>
+        <span class="kmeta" id="modalMeta"></span>
+      </div>
+      <h2 id="modalTitle"></h2>
+      <div class="article-author">
+        <div class="a-avatar">TT</div>
+        <div>
+          <div class="a-name">Phòng Truyền thông & Tuyển sinh</div>
+          <div class="a-role">Đại học Duy Tân — thông tin chính thức</div>
+        </div>
+      </div>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <img src="../assets/logo.png" alt="Đại học Duy Tân">
+    <p>© 2026 Đại học Duy Tân — Sản phẩm demo thuộc đề tài NCKH cấp trường.</p>
+  </div>
+</footer>
+
+<!-- ===== Chat widget ===== -->
+<button class="chat-fab" id="chatFab" onclick="toggleChat()" aria-label="Mở hỏi đáp tuyển sinh">
+  <svg class="icon" style="width:26px;height:26px;"><use href="#i-message"/></svg><span class="badge">AI</span>
+</button>
+
+<div class="chat-panel" id="chatPanel">
+  <div class="chat-head">
+    <div class="bot-avatar"><svg class="icon" style="width:18px;height:18px;"><use href="#i-cap"/></svg></div>
+    <div>
+      <div class="t1">Trợ lý tuyển sinh DTU</div>
+      <div class="t2"><span class="dot-live"></span>Đang trực tuyến</div>
+    </div>
+    <button class="chat-close" onclick="toggleChat()">✕</button>
+  </div>
+  <div class="chat-body" id="chatBody"></div>
+  <div class="chips" id="chipRow">
+    <button class="chip" onclick="askAbout('Học phí ngành CNTT năm 2026 là bao nhiêu?')">Học phí CNTT?</button>
+    <button class="chip" onclick="askAbout('Điều kiện xét học bạ là gì?')">Xét học bạ?</button>
+    <button class="chip" onclick="askAbout('Trường có học bổng cho tân sinh viên không?')">Học bổng?</button>
+    <button class="chip" onclick="askAbout('Trường có ký túc xá không?')">Ký túc xá?</button>
+  </div>
+  <div class="chat-input-row">
+    <input id="chatInput" type="text" placeholder="Nhập câu hỏi của bạn..." autocomplete="off">
+    <button class="chat-send" id="chatSend" onclick="sendMessage()"><svg class="icon" style="width:16px;height:16px;"><use href="#i-send"/></svg></button>
+  </div>
+</div>
+
+<script>
+const API_BASE = window.DTU_API_BASE || "http://localhost:8000/api";
+
+/* ===== Chat state ===== */
+let chatOpen = false;
+let greeted = false;
+
+function toggleChat(){
+  chatOpen = !chatOpen;
+  document.getElementById("chatPanel").classList.toggle("open", chatOpen);
+  if (chatOpen && !greeted){
+    greeted = true;
+    addBotMessage("Chào bạn! 👋 Mình là trợ lý tuyển sinh của Đại học Duy Tân. Bạn muốn hỏi về ngành học, học phí, học bổng hay điều kiện xét tuyển?");
+  }
+  if (chatOpen) document.getElementById("chatInput").focus();
+}
+function openChat(){ if (!chatOpen) toggleChat(); }
+
+function addUserMessage(text){
+  const el = document.createElement("div");
+  el.className = "msg user";
+  el.textContent = text;
+  document.getElementById("chatBody").appendChild(el);
+  scrollChat();
+}
+function addBotMessage(text, handoff = false){
+  const el = document.createElement("div");
+  el.className = "msg bot";
+  el.textContent = text;
+  if (handoff){
+    const b = document.createElement("span");
+    b.className = "handoff-badge";
+    b.textContent = "Đã chuyển tư vấn viên hỗ trợ";
+    el.appendChild(document.createElement("br"));
+    el.appendChild(b);
+  }
+  document.getElementById("chatBody").appendChild(el);
+  scrollChat();
+}
+/* Form thu lead trong chat — hiện khi chatbot phải chuyển tư vấn viên */
+function addLeadForm(question){
+  const el = document.createElement("div");
+  el.className = "msg bot lead-form-box";
+  el.innerHTML = `
+    <b>📞 Bạn muốn tư vấn viên gọi lại?</b><br>
+    <span style="font-size:12px;color:var(--muted);">Để lại thông tin — đội tuyển sinh sẽ liên hệ trong 24 giờ (miễn phí).</span>
+    <input type="text" class="lf-name" placeholder="Họ tên của bạn" maxlength="60">
+    <input type="text" class="lf-contact" placeholder="Số điện thoại hoặc Zalo/email" maxlength="60">
+    <div class="lf-err"></div>
+    <button class="lf-submit">Gửi thông tin — nhận tư vấn miễn phí</button>`;
+  document.getElementById("chatBody").appendChild(el);
+  scrollChat();
+
+  el.querySelector(".lf-submit").addEventListener("click", async () => {
+    const ho_ten = el.querySelector(".lf-name").value.trim();
+    const lien_he = el.querySelector(".lf-contact").value.trim();
+    const errEl = el.querySelector(".lf-err");
+    if (!ho_ten || !lien_he){ errEl.textContent = "Vui lòng điền đủ họ tên và liên hệ nhé."; return; }
+    const btn = el.querySelector(".lf-submit");
+    btn.disabled = true; btn.textContent = "Đang gửi...";
+    try {
+      const res = await fetch(API_BASE + "/chatbot/lead", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ho_ten, lien_he, cau_hoi: question }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Lỗi máy chủ");
+      el.innerHTML = `<b>✅ Cảm ơn ${escapeHtml(ho_ten)}!</b><br>
+        <span style="font-size:12.5px;">${escapeHtml(data.message)}</span>`;
+      scrollChat();
+    } catch (err) {
+      errEl.textContent = "Lỗi: " + err.message;
+      btn.disabled = false; btn.textContent = "Gửi thông tin — nhận tư vấn miễn phí";
+    }
+  });
+}
+
+function showTyping(){
+  const el = document.createElement("div");
+  el.className = "typing";
+  el.id = "typingIndicator";
+  el.innerHTML = "<span></span><span></span><span></span>";
+  document.getElementById("chatBody").appendChild(el);
+  scrollChat();
+}
+function hideTyping(){
+  const el = document.getElementById("typingIndicator");
+  if (el) el.remove();
+}
+function scrollChat(){
+  const body = document.getElementById("chatBody");
+  body.scrollTop = body.scrollHeight;
+}
+
+async function sendMessage(){
+  const input = document.getElementById("chatInput");
+  const question = input.value.trim();
+  if (!question) return;
+  input.value = "";
+  askAbout(question);
+}
+
+async function askAbout(question){
+  openChat();
+  addUserMessage(question);
+  const sendBtn = document.getElementById("chatSend");
+  sendBtn.disabled = true;
+  showTyping();
+  try {
+    const res = await fetch(API_BASE + "/chatbot/hoi", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ cau_hoi: question }),
+    });
+    const data = await res.json();
+    hideTyping();
+    if (!res.ok) throw new Error(data.error || "Lỗi máy chủ");
+    addBotMessage(data.answer, data.handoff);
+    if (data.handoff) addLeadForm(question);
+  } catch (err) {
+    hideTyping();
+    addBotMessage("Xin lỗi, hệ thống đang gián đoạn. Bạn thử lại sau ít phút hoặc liên hệ hotline tuyển sinh của trường nhé.");
+  } finally {
+    sendBtn.disabled = false;
+    document.getElementById("chatInput").focus();
+  }
+}
+
+document.getElementById("chatInput").addEventListener("keydown", e => {
+  if (e.key === "Enter") sendMessage();
+});
+
+/* ===== Tin tuyển sinh: đọc dữ liệu thật từ backend ===== */
+/* Ảnh bìa theo ngành/chủ đề — bộ SVG thiết kế riêng trong assets/covers/ */
+const COVER_BY_NGANH = {
+  "Công nghệ thông tin": "cntt", "CNTT": "cntt",
+  "Y Dược": "yduoc", "Y - Dược": "yduoc",
+  "Kiến trúc": "kientruc",
+  "Kinh tế": "kinhte", "Kinh tế - Quản trị": "kinhte",
+  "Du lịch": "dulich", "Du lịch - Khách sạn": "dulich",
+  "Ngôn ngữ": "ngonngu",
+  "Toàn trường": "toantruong",
+};
+function coverFor(r){
+  if (/học bổng/i.test(r.chu_de || "")) return "hocbong";
+  if (r.giai_doan === "Sự kiện thường niên") return "sukien";
+  if (r.giai_doan === "Mùa nhập học") return "nhaphoc";
+  return COVER_BY_NGANH[r.nganh] || "toantruong";
+}
+const coverSrc = r => `../assets/covers/${coverFor(r)}.svg`;
+function escapeHtml(s){
+  return String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+
+let newsData = [];
+
+async function loadNews(){
+  const grid = document.getElementById("newsGrid");
+  try {
+    const res = await fetch(API_BASE + "/content?trang_thai=da_dang");
+    if (!res.ok) throw new Error();
+    const rows = await res.json();
+    if (!rows.length){
+      grid.innerHTML = '<div class="news-empty">Chưa có tin mới — quay lại sau nhé.</div>';
+      return;
+    }
+    newsData = rows.slice(0, 6);
+    grid.innerHTML = newsData.map((r, i) => `
+      <div class="news-card${i === 0 ? ' featured' : ''}" style="animation-delay:${i * 0.05}s" onclick="openNewsDetail(${i})">
+        <div class="cover"><img src="${coverSrc(r)}" alt="${escapeHtml(r.nganh)}" loading="lazy"></div>
+        <div class="body">
+          <span class="tag">${escapeHtml(r.giai_doan)}</span>
+          <h3>${escapeHtml(r.chu_de)}</h3>
+          <div class="meta">
+            <span>${escapeHtml(r.nganh)} · ${new Date(r.ngay_dang_du_kien).toLocaleDateString("vi-VN")}</span>
+            <span class="read-more">Đọc tiếp →</span>
+          </div>
+        </div>
+      </div>`).join("");
+  } catch (err) {
+    grid.innerHTML = '<div class="news-empty">Không tải được tin mới (backend chưa chạy?). Chatbot vẫn hoạt động khi backend bật.</div>';
+  }
+}
+
+function openNewsDetail(i){
+  const r = newsData[i];
+  if (!r) return;
+  const text = r.caption_cuoi || r.ghi_chu || "Nội dung chi tiết đang được biên tập, quay lại sau nhé.";
+  const words = text.split(/\s+/).filter(Boolean).length;
+  const mins = Math.max(1, Math.round(words / 200));
+
+  document.getElementById("modalCoverImg").src = coverSrc(r);
+  document.getElementById("modalTag").textContent = r.giai_doan;
+  document.getElementById("modalTitle").textContent = r.chu_de;
+  document.getElementById("modalMeta").textContent =
+    `${r.nganh} · ${new Date(r.ngay_dang_du_kien).toLocaleDateString("vi-VN", {day:"numeric",month:"long",year:"numeric"})} · ${mins} phút đọc`;
+
+  // Tách nội dung thành sapo + các đoạn, nhặt câu có trích dẫn làm quote nổi bật
+  const sents = text.split(/(?<=[.!?…])\s+/).filter(s => s.trim());
+  const lead = sents[0] || text;
+  let rest = sents.slice(1);
+  let quote = null;
+  const qIdx = rest.findIndex(s => /["“”]/.test(s) && s.length > 50);
+  if (qIdx >= 0) { quote = rest[qIdx]; rest = rest.filter((_, k) => k !== qIdx); }
+  const paras = [];
+  for (let k = 0; k < rest.length; k += 2) paras.push(rest.slice(k, k + 2).join(" "));
+
+  const figCaption = "Khuôn viên Đại học Duy Tân tại Đà Nẵng — nơi diễn ra các hoạt động đào tạo và trải nghiệm sinh viên.";
+  const boDau = s => String(s).normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/đ/g, "d").replace(/Đ/g, "D");
+  const tags = ["#TuyenSinh2026", "#DaiHocDuyTan", "#" + boDau(r.nganh || "").replace(/[\s-]/g, "")];
+
+  let html = `<p class="article-lead">${escapeHtml(lead)}</p>`;
+  if (paras[0]) html += `<div class="article-paras"><p>${escapeHtml(paras[0])}</p></div>`;
+  html += `<figure class="article-fig"><img src="../assets/covers/campus.svg" alt="Đại học Duy Tân"><figcaption>${escapeHtml(figCaption)}</figcaption></figure>`;
+  if (quote) html += `<blockquote class="article-quote">${escapeHtml(quote.replace(/^["“]|["”]\s*$/g, ""))}</blockquote>`;
+  if (paras.length > 1) html += `<div class="article-paras">${paras.slice(1).map(p => `<p>${escapeHtml(p)}</p>`).join("")}</div>`;
+  html += `<div class="article-tags">${tags.map(t => `<span>${escapeHtml(t)}</span>`).join("")}</div>`;
+  html += `
+    <div class="article-cta">
+      <div>
+        <div class="c-t1">Bạn quan tâm nội dung này?</div>
+        <div class="c-t2">Trợ lý AI tuyển sinh trả lời ngay mọi thắc mắc — miễn phí, 24/7.</div>
+      </div>
+      <button class="btn btn-red" onclick="closeNewsDetail(); askAbout('Cho em hỏi thêm về: ${escapeHtml(r.chu_de).replace(/'/g, "\\'")}')">
+        <svg class="icon"><use href="#i-message"/></svg>Hỏi trợ lý AI
+      </button>
+    </div>`;
+
+  document.getElementById("modalContent").innerHTML = html;
+  document.getElementById("newsModal").classList.add("open");
+}
+function closeNewsDetail(){
+  document.getElementById("newsModal").classList.remove("open");
+}
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape") closeNewsDetail();
+});
+
+loadNews();
+</script>
+</body>
+</html>
