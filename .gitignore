@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+
+# Dữ liệu SQLite sinh tự động (được seed_data.py tạo lại khi khởi động)
+data/
+*.db
+*.sqlite3
+
+# Bí mật & log — KHÔNG bao giờ commit
+backend/.env
+.env
+*.log
+backend.log
+frontend.log
+
+# Hệ điều hành / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

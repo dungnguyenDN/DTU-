@@ -516,6 +516,7 @@
 
   #confettiCanvas{position:fixed;inset:0;pointer-events:none;z-index:90;}
 </style>
+<script src="/config.js"></script>
 </head>
 <body>
 
@@ -790,7 +791,7 @@
    CỔNG CHIA SẺ NỘI DUNG — Đại học Duy Tân
    Kết nối API backend thật (Flask + SQLite) — không có dữ liệu cứng.
    ================================================================== */
-const API_BASE = window.DTU_API_BASE || "http://localhost:8000/api";
+const API_BASE = window.DTU_API_BASE || "https://dtu-project.onrender.com/api";
 const DOT = "Đợt tuyển sinh 2026";
 
 let authToken = null;

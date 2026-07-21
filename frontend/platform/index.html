@@ -243,6 +243,7 @@
     .sidebar .footnote{display:none;}
   }
 </style>
+<script src="/config.js"></script>
 </head>
 <body>
 
@@ -530,7 +531,7 @@
    NỀN TẢNG QUẢN LÝ — kết nối API BACKEND THẬT (Flask + SQLite)
    Không còn dữ liệu mock — toàn bộ số liệu lấy từ /api/...
    ============================================================ */
-const API_BASE = window.DTU_API_BASE || "http://localhost:8000/api";
+const API_BASE = window.DTU_API_BASE || "https://dtu-project.onrender.com/api";
 
 // Token lưu trong biến JS (không dùng localStorage) — mất khi tải lại trang,
 // đây là đánh đổi chấp nhận được cho bản demo; production nên dùng httpOnly cookie.

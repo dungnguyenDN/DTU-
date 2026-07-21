@@ -1,0 +1,13 @@
+# Cấu hình Netlify cho frontend (site tĩnh, không cần build).
+# Cách dùng nhanh nhất: vào https://app.netlify.com/drop và kéo-thả cả thư mục "frontend".
+# (File này giúp Netlify hiểu cấu trúc khi deploy qua Git.)
+[build]
+  publish = "."
+
+# Trang chủ (index.html) là điểm vào điều hướng tới 3 giao diện.
+# Header bảo mật cơ bản cho site tĩnh.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
