@@ -8,7 +8,7 @@
 (function () {
   // 👉 SAU KHI DEPLOY BACKEND, đổi dòng dưới thành URL thật, ví dụ:
   //    "https://dtu-backend.onrender.com/api"
-  var PRODUCTION_API_BASE = "https://DOI-THANH-BACKEND-CUA-BAN.onrender.com/api";
+  var PRODUCTION_API_BASE = "https://dtu-backend.onrender.com/api";
 
   var isLocal = ["localhost", "127.0.0.1", ""].indexOf(location.hostname) !== -1;
   window.DTU_API_BASE = isLocal ? "http://localhost:8000/api" : PRODUCTION_API_BASE;
