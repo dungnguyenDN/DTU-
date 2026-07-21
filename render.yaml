@@ -1,6 +1,11 @@
 # Render.com Blueprint — deploy backend tự động chỉ với 1 cú click.
 # Cách dùng: đẩy repo lên GitHub -> Render Dashboard -> New -> Blueprint -> chọn repo.
-# Render đọc file này và tự tạo web service kèm ổ đĩa lưu SQLite + biến môi trường.
+#
+# Lưu ý gói FREE: không hỗ trợ ổ đĩa bền vững (disk). Không sao — startCommand chạy
+# seed_data.py mỗi lần khởi động nên dữ liệu mẫu luôn được tạo lại đầy đủ. SQLite ghi
+# vào /tmp (ghi được trên máy chủ). Dữ liệu phát sinh trong phiên (lead mới, bài mới...)
+# sẽ reset khi server ngủ/khởi động lại — chấp nhận được cho demo. Cần lưu vĩnh viễn thì
+# nâng gói có disk hoặc chuyển sang Postgres.
 services:
   - type: web
     name: dtu-backend
@@ -16,13 +21,9 @@ services:
         value: "3.12.6"
       - key: SECRET_KEY          # Render tự sinh chuỗi ngẫu nhiên an toàn
         generateValue: true
-      - key: DATABASE_PATH       # trỏ vào ổ đĩa bền vững bên dưới
-        value: /var/data/dtu_platform.db
+      - key: DATABASE_PATH       # thư mục tạm ghi được (gói free không có disk bền vững)
+        value: /tmp/dtu_platform.db
       - key: CORS_ALLOWED_ORIGINS
         value: "*"               # có thể siết lại thành URL frontend sau khi deploy
       - key: ANTHROPIC_API_KEY   # để trống vẫn chạy (chế độ AI offline); điền để dùng Claude thật
         sync: false
-    disk:
-      name: dtu-sqlite
-      mountPath: /var/data
-      sizeGB: 1

@@ -33,7 +33,9 @@ git push -u origin main
    - Web service `dtu-backend`, gói **Free**
    - Build: `pip install -r requirements.txt`
    - Start: `python seed_data.py && gunicorn app:app ...` (WSGI production)
-   - Ổ đĩa 1 GB lưu SQLite, `SECRET_KEY` tự sinh, health check `/api/health`
+   - `SECRET_KEY` tự sinh, health check `/api/health`, SQLite ghi vào `/tmp`
+
+> **Gói Free không có ổ đĩa bền vững** — không sao: `seed_data.py` chạy lại mỗi lần khởi động nên dữ liệu mẫu luôn đầy đủ. Dữ liệu phát sinh trong phiên (lead mới, bài mới...) sẽ reset khi server ngủ/khởi động lại. Cần lưu vĩnh viễn thì nâng gói có disk hoặc chuyển Postgres.
 3. (Tùy chọn) Điền `ANTHROPIC_API_KEY` trong tab **Environment** để chatbot/soạn caption dùng Claude thật. Bỏ trống vẫn chạy đầy đủ ở chế độ AI offline.
 4. Bấm **Apply** → Render build & deploy, trả về URL dạng `https://dtu-backend.onrender.com`.
 5. Kiểm tra: mở `https://dtu-backend.onrender.com/api/health` — phải thấy `{"status":"ok"}`.
