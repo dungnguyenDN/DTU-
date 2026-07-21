@@ -11,6 +11,7 @@ services:
     name: dtu-backend
     runtime: python
     plan: free
+    autoDeploy: true          # tự động deploy lại mỗi khi push lên nhánh main
     rootDir: backend
     buildCommand: pip install -r requirements.txt
     # Nạp dữ liệu mẫu rồi chạy gunicorn (WSGI production). 1 worker để tránh khoá ghi SQLite.
