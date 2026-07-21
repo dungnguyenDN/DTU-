@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS giang_vien (
     khoa TEXT NOT NULL,
     mat_khau_hash TEXT NOT NULL,
     vai_tro TEXT NOT NULL DEFAULT 'giang_vien',  -- giang_vien | quan_ly
+    kich_hoat INTEGER NOT NULL DEFAULT 1,        -- 1 = hoạt động, 0 = đã khóa
     ngay_tao TEXT DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -111,6 +112,11 @@ def get_connection():
 def init_db():
     conn = get_connection()
     conn.executescript(SCHEMA)
+    # Migration an toàn cho CSDL cũ đã tạo trước khi có cột kich_hoat.
+    try:
+        conn.execute("ALTER TABLE giang_vien ADD COLUMN kich_hoat INTEGER NOT NULL DEFAULT 1")
+    except sqlite3.OperationalError:
+        pass  # cột đã tồn tại
     conn.commit()
     conn.close()
 

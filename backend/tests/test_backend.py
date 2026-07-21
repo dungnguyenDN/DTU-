@@ -435,6 +435,82 @@ class TestPortalAPIEndpoints(unittest.TestCase):
         self.assertGreaterEqual(len(data["bang_xep_hang"]), 1)
         self.assertEqual(data["bang_xep_hang"][0]["hang"], 1)
 
+    # ---------- Quản trị người dùng ----------
+    def test_admin_list_requires_manager(self):
+        self.assertEqual(self.client.get("/api/admin/users", headers=self.auth).status_code, 403)
+        self.assertEqual(self.client.get("/api/admin/users", headers=self.ql_auth).status_code, 200)
+
+    def test_admin_create_and_duplicate(self):
+        payload = {"ma_giang_vien": "GVNEW1", "ho_ten": "GV Mới", "email": "gvnew1@duytan.edu.vn",
+                   "khoa": "Khoa CNTT", "mat_khau": "Pass123!", "vai_tro": "giang_vien"}
+        r1 = self.client.post("/api/admin/users", json=payload, headers=self.ql_auth)
+        self.assertEqual(r1.status_code, 201)
+        self.assertNotIn("mat_khau_hash", r1.get_json())
+        # Trùng email/mã -> 409
+        r2 = self.client.post("/api/admin/users", json=payload, headers=self.ql_auth)
+        self.assertEqual(r2.status_code, 409)
+
+    def test_admin_created_user_can_login(self):
+        payload = {"ma_giang_vien": "GVNEW2", "ho_ten": "GV Login", "email": "gvnew2@duytan.edu.vn",
+                   "khoa": "Khoa CNTT", "mat_khau": "Pass123!"}
+        self.client.post("/api/admin/users", json=payload, headers=self.ql_auth)
+        login = self.client.post("/api/auth/login", json={"email": "gvnew2@duytan.edu.vn", "mat_khau": "Pass123!"})
+        self.assertEqual(login.status_code, 200)
+
+    def test_admin_lock_blocks_login(self):
+        self.client.post("/api/admin/users", json={
+            "ma_giang_vien": "GVLOCK", "ho_ten": "GV Khoa", "email": "gvlock@duytan.edu.vn",
+            "khoa": "Khoa CNTT", "mat_khau": "Pass123!"}, headers=self.ql_auth)
+        uid = db.query("SELECT id FROM giang_vien WHERE email = 'gvlock@duytan.edu.vn'", fetchone=True)["id"]
+        lock = self.client.post(f"/api/admin/users/{uid}/khoa", json={"kich_hoat": 0}, headers=self.ql_auth)
+        self.assertEqual(lock.status_code, 200)
+        login = self.client.post("/api/auth/login", json={"email": "gvlock@duytan.edu.vn", "mat_khau": "Pass123!"})
+        self.assertEqual(login.status_code, 403, "Tài khoản bị khóa không được đăng nhập")
+
+    def test_admin_reset_password(self):
+        self.client.post("/api/admin/users", json={
+            "ma_giang_vien": "GVRESET", "ho_ten": "GV Reset", "email": "gvreset@duytan.edu.vn",
+            "khoa": "Khoa CNTT", "mat_khau": "Pass123!"}, headers=self.ql_auth)
+        uid = db.query("SELECT id FROM giang_vien WHERE email = 'gvreset@duytan.edu.vn'", fetchone=True)["id"]
+        r = self.client.post(f"/api/admin/users/{uid}/reset-mat-khau", json={"mat_khau": "MoiPass456!"}, headers=self.ql_auth)
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.get_json()["mat_khau_moi"], "MoiPass456!")
+        login = self.client.post("/api/auth/login", json={"email": "gvreset@duytan.edu.vn", "mat_khau": "MoiPass456!"})
+        self.assertEqual(login.status_code, 200)
+
+    def test_admin_cannot_delete_or_lock_self(self):
+        me = db.query("SELECT id FROM giang_vien WHERE email = 'qlportal@duytan.edu.vn'", fetchone=True)["id"]
+        self.assertEqual(self.client.delete(f"/api/admin/users/{me}", headers=self.ql_auth).status_code, 400)
+        self.assertEqual(self.client.post(f"/api/admin/users/{me}/khoa", json={"kich_hoat": 0}, headers=self.ql_auth).status_code, 400)
+
+    def test_db_stats(self):
+        r = self.client.get("/api/admin/thong-ke-db", headers=self.ql_auth)
+        self.assertEqual(r.status_code, 200)
+        data = r.get_json()
+        self.assertEqual(data["engine"], "SQLite")
+        self.assertTrue(any(t["bang"] == "giang_vien" for t in data["tables"]))
+
+    # ---------- Duyệt bài ----------
+    def test_approve_publish_with_edited_caption(self):
+        cid = db.execute(
+            """INSERT INTO lich_noi_dung (ngay_dang_du_kien, giai_doan, chu_de, nganh, trang_thai, caption_cuoi)
+               VALUES ('2026-07-28', 'Mùa tuyển sinh', 'Bài chờ duyệt', 'CNTT', 'cho_duyet', 'Bản nháp.')""")
+        r = self.client.post(f"/api/content/{cid}/duyet-va-dang",
+                             json={"caption_cuoi": "Bản đã duyệt cuối cùng."}, headers=self.ql_auth)
+        self.assertEqual(r.status_code, 200)
+        row = db.query("SELECT trang_thai, caption_cuoi FROM lich_noi_dung WHERE id = ?", (cid,), fetchone=True)
+        self.assertEqual(row["trang_thai"], "da_dang")
+        self.assertEqual(row["caption_cuoi"], "Bản đã duyệt cuối cùng.")
+
+    def test_send_back_to_draft(self):
+        cid = db.execute(
+            """INSERT INTO lich_noi_dung (ngay_dang_du_kien, giai_doan, chu_de, nganh, trang_thai)
+               VALUES ('2026-07-29', 'Mùa tuyển sinh', 'Bài trả lại', 'CNTT', 'cho_duyet')""")
+        r = self.client.post(f"/api/content/{cid}/tra-lai", headers=self.ql_auth)
+        self.assertEqual(r.status_code, 200)
+        row = db.query("SELECT trang_thai FROM lich_noi_dung WHERE id = ?", (cid,), fetchone=True)
+        self.assertEqual(row["trang_thai"], "cho_soan")
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

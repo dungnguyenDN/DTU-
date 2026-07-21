@@ -264,9 +264,30 @@ def approve_and_publish(content_id):
     if row is None:
         return jsonify({"error": "Không tìm thấy mục lịch nội dung"}), 404
 
+    # Cho phép người duyệt sửa caption lần cuối ngay khi bấm duyệt
+    payload = request.get_json(force=True, silent=True) or {}
+    caption = (payload.get("caption_cuoi") or "").strip()
+
     fake_post_link = f"https://facebook.com/duytanuniversity/posts/{content_id}"
-    db.execute(
-        "UPDATE lich_noi_dung SET trang_thai = 'da_dang', link_bai_dang = ? WHERE id = ?",
-        (fake_post_link, content_id),
-    )
+    if caption:
+        db.execute(
+            "UPDATE lich_noi_dung SET trang_thai = 'da_dang', link_bai_dang = ?, caption_cuoi = ? WHERE id = ?",
+            (fake_post_link, caption, content_id),
+        )
+    else:
+        db.execute(
+            "UPDATE lich_noi_dung SET trang_thai = 'da_dang', link_bai_dang = ? WHERE id = ?",
+            (fake_post_link, content_id),
+        )
     return jsonify({"id": content_id, "trang_thai": "da_dang", "link_bai_dang": fake_post_link})
+
+
+@bp.post("/<int:content_id>/tra-lai")
+@login_required(role="quan_ly")
+def send_back(content_id):
+    """Trả bài về 'chờ soạn' để chỉnh sửa lại (dùng khi người duyệt chưa hài lòng)."""
+    row = db.query("SELECT id FROM lich_noi_dung WHERE id = ?", (content_id,), fetchone=True)
+    if row is None:
+        return jsonify({"error": "Không tìm thấy mục lịch nội dung"}), 404
+    db.execute("UPDATE lich_noi_dung SET trang_thai = 'cho_soan' WHERE id = ?", (content_id,))
+    return jsonify({"id": content_id, "trang_thai": "cho_soan"})

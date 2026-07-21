@@ -11,7 +11,7 @@ from flask import Flask, jsonify
 from config import Config
 import database as db
 
-from routes import auth_routes, content_routes, teacher_routes, kpi_routes, chatbot_routes, benchmark_routes, funnel_routes
+from routes import auth_routes, content_routes, teacher_routes, kpi_routes, chatbot_routes, benchmark_routes, funnel_routes, admin_routes
 
 
 def create_app():
@@ -27,6 +27,7 @@ def create_app():
     app.register_blueprint(chatbot_routes.bp)
     app.register_blueprint(benchmark_routes.bp)
     app.register_blueprint(funnel_routes.bp)
+    app.register_blueprint(admin_routes.bp)
 
     # CORS thủ công (không phụ thuộc flask-cors) — cho phép frontend (platform/portal)
     # gọi API từ domain khác khi deploy tách rời (ví dụ frontend trên Netlify, backend trên Render).

@@ -21,6 +21,10 @@ def login():
     if row is None or not verify_password(mat_khau, row["mat_khau_hash"]):
         return jsonify({"error": "Email hoặc mật khẩu không đúng"}), 401
 
+    # Tài khoản bị quản trị viên khóa thì không cho đăng nhập
+    if "kich_hoat" in row.keys() and row["kich_hoat"] == 0:
+        return jsonify({"error": "Tài khoản đã bị khóa. Vui lòng liên hệ quản trị viên."}), 403
+
     token = create_token({
         "sub": row["ma_giang_vien"],
         "id": row["id"],

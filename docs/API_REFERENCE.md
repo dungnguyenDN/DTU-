@@ -23,6 +23,8 @@ Endpoint đánh dấu 🔒👤 yêu cầu vai trò `quan_ly` (quản lý), 🔒 
 | POST | `/content/<id>/ab-caption` | 🔒👤 | **A/B testing**: AI sinh 2 biến thể caption (A thông tin / B cảm xúc) |
 | POST | `/content/<id>/chon-caption` | 🔒👤 | Lưu biến thể thắng làm caption chính thức (`{caption, bien_the}`) |
 | POST | `/content/<id>/da-kenh` | 🔒 | **Đa kênh**: sinh 3 biến thể Facebook / tin nhắn Zalo / kịch bản TikTok |
+| POST | `/content/<id>/duyet-va-dang` | 🔒👤 | **Duyệt & đăng** (nhận `caption_cuoi` tùy chọn để sửa lần cuối) |
+| POST | `/content/<id>/tra-lai` | 🔒👤 | Trả bài về trạng thái "chờ soạn" |
 | POST | `/content` | 🔒👤 | Thêm mục lịch nội dung mới |
 | POST | `/content/<id>/soan-nhap-ai` | 🔒👤 | Gọi AI soạn caption, chuyển trạng thái sang "chờ duyệt" |
 | POST | `/content/<id>/duyet-va-dang` | 🔒👤 | Duyệt và đăng (mô phỏng Facebook API) |
@@ -43,6 +45,18 @@ Endpoint đánh dấu 🔒👤 yêu cầu vai trò `quan_ly` (quản lý), 🔒 
 | Method | Path | Quyền | Mô tả |
 |---|---|---|---|
 | GET | `/funnel/mo-phong` | 🔒👤 | **Mô phỏng What-if**: dự báo click/hồ sơ/nhập học nếu `?so_giang_vien=N&so_bai=M` — tính từ click trung bình/bài và tỷ lệ chuyển đổi thật trong DB |
+
+## Quản trị hệ thống (chỉ quản lý)
+
+| Method | Path | Quyền | Mô tả |
+|---|---|---|---|
+| GET | `/admin/users` | 🔒👤 | Danh sách người dùng (không kèm mật khẩu) |
+| POST | `/admin/users` | 🔒👤 | Tạo người dùng mới (`ma_giang_vien, ho_ten, email, khoa, mat_khau, vai_tro`) |
+| PUT | `/admin/users/<id>` | 🔒👤 | Sửa họ tên / khoa / vai trò (chặn tự hạ quyền) |
+| POST | `/admin/users/<id>/reset-mat-khau` | 🔒👤 | Đặt lại mật khẩu (trả về mật khẩu mới) |
+| POST | `/admin/users/<id>/khoa` | 🔒👤 | Khóa/mở tài khoản (`kich_hoat`: 0/1); chặn tự khóa |
+| DELETE | `/admin/users/<id>` | 🔒👤 | Xóa người dùng (chặn tự xóa) |
+| GET | `/admin/thong-ke-db` | 🔒👤 | Số bản ghi từng bảng CSDL |
 
 ## KPI / Tổng quan
 

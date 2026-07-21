@@ -3,7 +3,7 @@
 Sản phẩm ứng dụng của đề tài nghiên cứu khoa học cấp trường: *"Giải pháp truyền thông - marketing số nhằm gia tăng độ nhận diện và sức lan tỏa cho các ngành đào tạo tại Đại học Duy Tân"*.
 
 Đây là **dự án phần mềm hoàn chỉnh, chạy được thật** — không phải giao diện tĩnh minh hoạ:
-backend Python có cơ sở dữ liệu, xác thực, logic nghiệp vụ thật và **47 kiểm thử tự động đều PASS**.
+backend Python có cơ sở dữ liệu, xác thực, logic nghiệp vụ thật và **56 kiểm thử tự động đều PASS**.
 
 ## Cấu trúc dự án
 
@@ -99,7 +99,7 @@ Cổng chia sẻ (`/portal/index.html`) là dashboard hoàn chỉnh dành cho gi
 cd backend
 python3 -m unittest discover -s tests -v
 ```
-Kết quả: **47/47 test PASS** — bao gồm kiểm thử băm mật khẩu, JWT, phân quyền (RBAC), logic tính cấp bậc giảng viên, logic phễu chuyển đổi, khớp FAQ chatbot, logic AI đề xuất theo mùa vụ, cá nhân hoá caption, huy hiệu thành tích, mô phỏng What-if, AI lập kế hoạch tháng, A/B caption, đa kênh, thu lead, và toàn bộ endpoint API qua `Flask.test_client()`.
+Kết quả: **56/56 test PASS** — bao gồm kiểm thử băm mật khẩu, JWT, phân quyền (RBAC), logic tính cấp bậc giảng viên, logic phễu chuyển đổi, khớp FAQ chatbot, logic AI đề xuất theo mùa vụ, cá nhân hoá caption, huy hiệu thành tích, mô phỏng What-if, AI lập kế hoạch tháng, A/B caption, đa kênh, thu lead, quản trị người dùng (tạo/khóa/reset/xóa), duyệt & đăng bài, và toàn bộ endpoint API qua `Flask.test_client()`.
 
 ## Các tính năng mở rộng (đã chạy thật, có test)
 
@@ -112,6 +112,9 @@ Kết quả: **47/47 test PASS** — bao gồm kiểm thử băm mật khẩu, J
 | Thi đua giữa các khoa | Portal | `GET /api/teachers/bang-xep-hang-khoa` |
 | Đa kênh: Facebook / Zalo / kịch bản TikTok | Portal → modal bài viết | `POST /api/content/<id>/da-kenh` |
 | Poster QR cá nhân (offline-to-online, UTM định danh) | Portal → modal bài viết | tạo phía client, QR qua api.qrserver.com (có fallback) |
+| **Quản trị người dùng** (thêm/sửa vai trò/reset MK/khóa/xóa) | Platform → Quản trị hệ thống | `/api/admin/users...` |
+| **Duyệt & đăng bài** (sửa caption lần cuối, trả lại chờ soạn) | Platform → Lịch nội dung → nút "Duyệt" | `/api/content/<id>/duyet-va-dang`, `/tra-lai` |
+| **Xem nhanh cơ sở dữ liệu** (số bản ghi từng bảng) | Platform → Quản trị hệ thống | `/api/admin/thong-ke-db` |
 
 Kiểm thử toàn trình (chạy server thật, gọi qua HTTP như người dùng thật):
 ```bash

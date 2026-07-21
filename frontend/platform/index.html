@@ -184,6 +184,41 @@
   .ab-variant button:hover{opacity:.92;}
   .ab-close{float:right;border:none;background:var(--gray-tint);border-radius:50%;width:30px;height:30px;cursor:pointer;font-size:14px;}
 
+  /* Quản trị: badge vai trò, trạng thái, nút thao tác */
+  .role-badge{display:inline-block;font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;}
+  .role-quan_ly{background:#EDE7FB;color:#6D28D9;}
+  .role-giang_vien{background:#E7F0FB;color:#1E5F9E;}
+  .stt-pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;}
+  .stt-pill::before{content:"";width:8px;height:8px;border-radius:50%;}
+  .stt-on{color:var(--success);}.stt-on::before{background:var(--success);}
+  .stt-off{color:#B4520F;}.stt-off::before{background:#E08A3C;}
+  .u-actions{display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap;}
+  .u-act{border:1px solid var(--line);background:#fff;border-radius:8px;padding:5px 10px;font-size:11.5px;font-weight:700;cursor:pointer;color:var(--ink-soft);white-space:nowrap;font-family:'Inter',sans-serif;}
+  .u-act:hover{border-color:var(--red);color:var(--red);}
+  .u-act.danger:hover{border-color:#C0392B;color:#C0392B;}
+  .u-me{font-size:10.5px;color:var(--muted);font-weight:700;margin-left:6px;}
+
+  /* Nút duyệt / trả lại / lưu */
+  .btn-approve{border:none;border-radius:10px;background:var(--success);color:#fff;padding:11px 18px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;}
+  .btn-approve:hover{opacity:.92;}
+  .btn-approve:disabled{opacity:.6;cursor:default;}
+  .btn-sendback{border:1.5px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);padding:11px 18px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;}
+  .btn-sendback:hover{border-color:#B4520F;color:#B4520F;}
+
+  /* Form người dùng */
+  .user-form label{display:block;font-size:12px;font-weight:700;margin:12px 0 5px;color:var(--text);}
+  .user-form input, .user-form select{width:100%;border:1.5px solid var(--line);border-radius:10px;padding:10px 13px;font-size:13.5px;font-family:'Inter',sans-serif;}
+  .user-form input:focus, .user-form select:focus{outline:2px solid var(--red);outline-offset:1px;}
+  .uf-err{color:#C0392B;font-size:12px;min-height:16px;margin-top:8px;}
+
+  /* Xem nhanh database */
+  .db-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+  @media (max-width:700px){.db-grid{grid-template-columns:repeat(2,1fr);}}
+  .db-card{border:1px solid var(--line);border-radius:12px;padding:14px 16px;}
+  .db-card .n{font-family:'Manrope',sans-serif;font-weight:800;font-size:22px;color:var(--red);}
+  .db-card .t{font-size:12.5px;color:var(--text);font-weight:600;margin-top:2px;}
+  .db-card .c{font-size:11px;color:var(--muted);font-family:'Inter',monospace;margin-top:3px;}
+
   /* What-if simulator */
   .whatif-grid{display:grid;grid-template-columns:290px 1fr;gap:26px;align-items:start;}
   @media (max-width:820px){.whatif-grid{grid-template-columns:1fr;}}
@@ -273,6 +308,7 @@
     <div class="nav-item" data-tab="leads"><span class="ic">◉</span> Lead tư vấn</div>
     <div class="nav-item" data-tab="benchmark"><span class="ic">◈</span> Benchmark đối thủ</div>
     <div class="nav-item" data-tab="funnel"><span class="ic">▽</span> Phễu chuyển đổi</div>
+    <div class="nav-item" data-tab="admin"><span class="ic">⚙</span> Quản trị hệ thống</div>
     <div class="footnote">Dữ liệu tổng hợp từ Facebook, Cổng chia sẻ nội dung và Chatbot AI. Vận hành phía sau bởi 4 workflow tự động hoá (n8n) — không hiển thị trực tiếp ở đây.</div>
   </div>
 
@@ -498,6 +534,30 @@
       </div>
     </div>
 
+    <!-- ================= TAB: QUẢN TRỊ HỆ THỐNG ================= -->
+    <div class="tab-panel" id="tab-admin">
+      <div class="page-header">
+        <div>
+          <h1>Quản trị hệ thống</h1>
+          <p>Quản lý tài khoản người dùng và theo dõi cơ sở dữ liệu — chỉ dành cho vai trò quản lý.</p>
+        </div>
+        <button class="btn-suggest" id="addUserBtn">＋ Thêm người dùng</button>
+      </div>
+
+      <div class="panel" style="margin-bottom:16px;">
+        <h3>Danh sách người dùng</h3>
+        <table>
+          <thead><tr><th>Họ tên</th><th>Email</th><th>Khoa</th><th>Vai trò</th><th>Trạng thái</th><th style="text-align:right;">Thao tác</th></tr></thead>
+          <tbody id="userTable"></tbody>
+        </table>
+      </div>
+
+      <div class="panel">
+        <h3>Xem nhanh cơ sở dữ liệu <span style="font-weight:400;color:var(--muted);font-size:12.5px;">· SQLite</span></h3>
+        <div class="db-grid" id="dbStatsGrid"></div>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -520,6 +580,48 @@
         <div class="text" id="abTextB"></div>
         <button onclick="chooseVariant('B')">Chọn biến thể B</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal DUYỆT BÀI -->
+<div class="ab-backdrop" id="approveBackdrop">
+  <div class="ab-modal" style="max-width:600px;">
+    <button class="ab-close" onclick="document.getElementById('approveBackdrop').classList.remove('open')">✕</button>
+    <h2>Duyệt bài đăng</h2>
+    <p class="sub" id="approveMeta"></p>
+    <label style="font-size:12.5px;font-weight:700;display:block;margin-bottom:6px;">Nội dung caption (có thể sửa lần cuối trước khi đăng):</label>
+    <textarea id="approveCaption" style="width:100%;min-height:180px;border:1.5px solid var(--line);border-radius:12px;padding:13px 15px;font-size:13.5px;line-height:1.65;font-family:'Inter',sans-serif;resize:vertical;"></textarea>
+    <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;">
+      <button class="btn-approve" id="approvePublishBtn">✓ Duyệt &amp; đăng</button>
+      <button class="btn-sendback" id="sendBackBtn">↩ Trả lại chờ soạn</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal THÊM/SỬA NGƯỜI DÙNG -->
+<div class="ab-backdrop" id="userBackdrop">
+  <div class="ab-modal" style="max-width:520px;">
+    <button class="ab-close" onclick="document.getElementById('userBackdrop').classList.remove('open')">✕</button>
+    <h2 id="userModalTitle">Thêm người dùng</h2>
+    <div class="user-form">
+      <label>Mã giảng viên / nhân viên</label>
+      <input id="uMa" placeholder="VD: GV013">
+      <label>Họ tên</label>
+      <input id="uHoTen" placeholder="VD: ThS. Nguyễn Văn X">
+      <label>Email</label>
+      <input id="uEmail" type="email" placeholder="email@duytan.edu.vn">
+      <label>Khoa / Phòng ban</label>
+      <input id="uKhoa" placeholder="VD: Khoa CNTT">
+      <label>Vai trò</label>
+      <select id="uVaiTro">
+        <option value="giang_vien">Giảng viên</option>
+        <option value="quan_ly">Quản lý</option>
+      </select>
+      <label>Mật khẩu ban đầu</label>
+      <input id="uMatKhau" placeholder="Mật khẩu cấp cho người dùng">
+      <div class="uf-err" id="uErr"></div>
+      <button class="btn-approve" id="saveUserBtn" style="width:100%;margin-top:6px;">Tạo người dùng</button>
     </div>
   </div>
 </div>
@@ -617,18 +719,158 @@ async function renderOverview() {
 
 /* ============ RENDER: Lịch nội dung ============ */
 const STATUS_LABELS = { cho_soan: ["Chờ soạn", "scheduled"], cho_duyet: ["Chờ duyệt", "pending"], da_dang: ["Đã đăng", "done"] };
+let contentById = {};
 async function renderContent(filter = "all") {
   const path = filter === "all" ? "/content" : `/content?trang_thai=${filter}`;
   const rows = await apiFetch(path);
+  contentById = {};
   document.getElementById("contentTable").innerHTML = rows.map(r => {
+    contentById[r.id] = r;
     const [label, cls] = STATUS_LABELS[r.trang_thai] || ["—", "scheduled"];
-    const action = r.trang_thai !== "da_dang"
-      ? `<button class="row-action" onclick="openAbModal(${r.id}, this)">⚖ A/B caption</button>` : "";
+    let action = "";
+    if (r.trang_thai !== "da_dang")
+      action += `<button class="row-action" onclick="openAbModal(${r.id}, this)">⚖ A/B caption</button> `;
+    if (r.trang_thai === "cho_duyet")
+      action += `<button class="row-action" style="border-color:var(--success);color:var(--success);" onclick="openApproveModal(${r.id})">✓ Duyệt</button>`;
     return `<tr>
       <td>${r.ngay_dang_du_kien}</td><td>${r.giai_doan}</td><td>${r.chu_de}</td>
       <td>${r.nganh}</td><td><span class="badge ${cls}">${label}</span></td><td>${action}</td>
     </tr>`;
   }).join("");
+}
+
+/* ============ Duyệt bài ============ */
+let approveId = null;
+function openApproveModal(id) {
+  const r = contentById[id];
+  if (!r) return;
+  approveId = id;
+  document.getElementById("approveMeta").textContent = `${r.chu_de} · ${r.nganh} · dự kiến đăng ${r.ngay_dang_du_kien}`;
+  document.getElementById("approveCaption").value = r.caption_cuoi || `${r.chu_de} — thông tin dành cho ngành ${r.nganh}.`;
+  document.getElementById("approveBackdrop").classList.add("open");
+}
+document.getElementById("approvePublishBtn").addEventListener("click", async () => {
+  if (!approveId) return;
+  try {
+    await apiFetch(`/content/${approveId}/duyet-va-dang`, {
+      method: "POST", body: JSON.stringify({ caption_cuoi: document.getElementById("approveCaption").value }),
+    });
+    document.getElementById("approveBackdrop").classList.remove("open");
+    showToast("Đã duyệt & đăng bài — chuyển sang trạng thái Đã đăng.", true);
+    await renderContent();
+  } catch (e) { showToast("Lỗi: " + e.message); }
+});
+document.getElementById("sendBackBtn").addEventListener("click", async () => {
+  if (!approveId) return;
+  try {
+    await apiFetch(`/content/${approveId}/tra-lai`, { method: "POST", body: "{}" });
+    document.getElementById("approveBackdrop").classList.remove("open");
+    showToast("Đã trả bài về Chờ soạn để chỉnh sửa lại.", true);
+    await renderContent();
+  } catch (e) { showToast("Lỗi: " + e.message); }
+});
+
+/* ============ Quản lý người dùng ============ */
+let usersById = {};
+async function renderUsers() {
+  const users = await apiFetch("/admin/users");
+  usersById = {};
+  const meId = currentUser && currentUser.id;
+  document.getElementById("userTable").innerHTML = users.map(u => {
+    usersById[u.id] = u;
+    const isMe = u.id === meId;
+    const roleLabel = u.vai_tro === "quan_ly" ? "Quản lý" : "Giảng viên";
+    const locked = u.kich_hoat === 0;
+    const actions = isMe
+      ? '<span class="u-me">(tài khoản của bạn)</span>'
+      : `<div class="u-actions">
+           <button class="u-act" onclick="toggleRole(${u.id})">Đổi vai trò</button>
+           <button class="u-act" onclick="resetPwd(${u.id})">Reset MK</button>
+           <button class="u-act" onclick="toggleLock(${u.id})">${locked ? "Mở khóa" : "Khóa"}</button>
+           <button class="u-act danger" onclick="delUser(${u.id})">Xóa</button>
+         </div>`;
+    return `<tr>
+      <td style="font-weight:700;">${u.ho_ten}</td>
+      <td>${u.email}</td>
+      <td>${u.khoa}</td>
+      <td><span class="role-badge role-${u.vai_tro}">${roleLabel}</span></td>
+      <td><span class="stt-pill ${locked ? "stt-off" : "stt-on"}">${locked ? "Đã khóa" : "Hoạt động"}</span></td>
+      <td style="text-align:right;">${actions}</td>
+    </tr>`;
+  }).join("");
+}
+
+async function toggleRole(id) {
+  const u = usersById[id];
+  const newRole = u.vai_tro === "quan_ly" ? "giang_vien" : "quan_ly";
+  try {
+    await apiFetch(`/admin/users/${id}`, { method: "PUT", body: JSON.stringify({ vai_tro: newRole }) });
+    showToast(`Đã đổi vai trò ${u.ho_ten} → ${newRole === "quan_ly" ? "Quản lý" : "Giảng viên"}.`, true);
+    await renderUsers();
+  } catch (e) { showToast("Lỗi: " + e.message); }
+}
+async function resetPwd(id) {
+  try {
+    const d = await apiFetch(`/admin/users/${id}/reset-mat-khau`, { method: "POST", body: "{}" });
+    try { await navigator.clipboard.writeText(d.mat_khau_moi); } catch {}
+    showToast(`Mật khẩu mới: ${d.mat_khau_moi} (đã copy) — gửi cho người dùng.`, true);
+  } catch (e) { showToast("Lỗi: " + e.message); }
+}
+async function toggleLock(id) {
+  const u = usersById[id];
+  const next = u.kich_hoat === 0 ? 1 : 0;
+  try {
+    await apiFetch(`/admin/users/${id}/khoa`, { method: "POST", body: JSON.stringify({ kich_hoat: next }) });
+    showToast(next === 0 ? `Đã khóa tài khoản ${u.ho_ten}.` : `Đã mở khóa ${u.ho_ten}.`, true);
+    await renderUsers();
+  } catch (e) { showToast("Lỗi: " + e.message); }
+}
+async function delUser(id) {
+  const u = usersById[id];
+  if (!confirm(`Xóa vĩnh viễn tài khoản "${u.ho_ten}"? Hành động này không hoàn tác được.`)) return;
+  try {
+    await apiFetch(`/admin/users/${id}`, { method: "DELETE" });
+    showToast(`Đã xóa tài khoản ${u.ho_ten}.`, true);
+    await Promise.all([renderUsers(), renderDbStats()]);
+  } catch (e) { showToast("Lỗi: " + e.message); }
+}
+
+document.getElementById("addUserBtn").addEventListener("click", () => {
+  ["uMa", "uHoTen", "uEmail", "uKhoa", "uMatKhau"].forEach(id => document.getElementById(id).value = "");
+  document.getElementById("uVaiTro").value = "giang_vien";
+  document.getElementById("uErr").textContent = "";
+  document.getElementById("userBackdrop").classList.add("open");
+});
+document.getElementById("saveUserBtn").addEventListener("click", async () => {
+  const body = {
+    ma_giang_vien: document.getElementById("uMa").value.trim(),
+    ho_ten: document.getElementById("uHoTen").value.trim(),
+    email: document.getElementById("uEmail").value.trim(),
+    khoa: document.getElementById("uKhoa").value.trim(),
+    vai_tro: document.getElementById("uVaiTro").value,
+    mat_khau: document.getElementById("uMatKhau").value,
+  };
+  const err = document.getElementById("uErr");
+  if (!body.ma_giang_vien || !body.ho_ten || !body.email || !body.khoa || !body.mat_khau) {
+    err.textContent = "Vui lòng điền đủ tất cả các trường."; return;
+  }
+  try {
+    await apiFetch("/admin/users", { method: "POST", body: JSON.stringify(body) });
+    document.getElementById("userBackdrop").classList.remove("open");
+    showToast(`Đã tạo tài khoản ${body.ho_ten}.`, true);
+    await Promise.all([renderUsers(), renderDbStats()]);
+  } catch (e) { err.textContent = e.message; }
+});
+
+/* ============ Xem nhanh database ============ */
+async function renderDbStats() {
+  const d = await apiFetch("/admin/thong-ke-db");
+  document.getElementById("dbStatsGrid").innerHTML = d.tables.map(t => `
+    <div class="db-card">
+      <div class="n">${t.so_ban_ghi.toLocaleString("vi-VN")}</div>
+      <div class="t">${t.mo_ta}</div>
+      <div class="c">${t.bang}</div>
+    </div>`).join("");
 }
 
 /* ============ AI lập kế hoạch tháng ============ */
@@ -898,6 +1140,8 @@ async function loadAllData() {
     lastTopics = await renderTopics();
     await renderBenchmark();
     await renderFunnel();
+    await renderUsers();
+    await renderDbStats();
   } catch (err) {
     console.error(err);
     showToast("Lỗi tải dữ liệu: " + err.message);
