@@ -19,11 +19,13 @@ def overview():
     chat_auto_row = db.query("SELECT COUNT(*) AS c FROM chat_log WHERE chuyen_tu_van_vien = 0", fetchone=True)
 
     teacher_total_row = db.query("SELECT COUNT(*) AS c FROM giang_vien WHERE vai_tro = 'giang_vien'", fetchone=True)
+    # Đếm số giảng viên đã đạt >= 5 bài. Viết tương thích cả SQLite lẫn Postgres:
+    # subquery phải có alias (AS sub) và HAVING dùng COUNT(*) thay vì alias cột.
     teacher_done_row = db.query(
-        """SELECT COUNT(DISTINCT giang_vien_id) AS c FROM (
-               SELECT giang_vien_id, COUNT(*) AS so_bai FROM share_log GROUP BY giang_vien_id
-               HAVING so_bai >= 5
-           )""",
+        """SELECT COUNT(*) AS c FROM (
+               SELECT giang_vien_id FROM share_log
+               GROUP BY giang_vien_id HAVING COUNT(*) >= 5
+           ) AS sub""",
         fetchone=True,
     )
 
