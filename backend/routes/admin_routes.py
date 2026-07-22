@@ -144,4 +144,4 @@ def db_stats():
     for bang, mo_ta in DB_TABLES:
         row = db.query(f"SELECT COUNT(*) AS c FROM {bang}", fetchone=True)
         result.append({"bang": bang, "mo_ta": mo_ta, "so_ban_ghi": row["c"]})
-    return jsonify({"tables": result, "engine": "SQLite"})
+    return jsonify({"tables": result, "engine": "PostgreSQL" if db.IS_POSTGRES else "SQLite"})

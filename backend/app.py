@@ -40,7 +40,11 @@ def create_app():
 
     @app.route("/api/health", methods=["GET"])
     def health():
-        return jsonify({"status": "ok", "service": "dtu-marketing-platform-backend"})
+        return jsonify({
+            "status": "ok",
+            "service": "dtu-marketing-platform-backend",
+            "db": "postgres" if db.IS_POSTGRES else "sqlite",
+        })
 
     @app.errorhandler(404)
     def not_found(e):
