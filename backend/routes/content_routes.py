@@ -33,9 +33,9 @@ def suggestion_today():
     """
     today = date.today().isoformat()
     row = db.query(
-        """SELECT * FROM lich_noi_dung
+        f"""SELECT * FROM lich_noi_dung
            WHERE trang_thai = 'da_dang'
-           ORDER BY ABS(julianday(ngay_dang_du_kien) - julianday(?)) ASC
+           ORDER BY {db.abs_day_diff_sql('ngay_dang_du_kien')} ASC
            LIMIT 1""",
         (today,),
         fetchone=True,

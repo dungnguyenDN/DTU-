@@ -16,4 +16,4 @@ EXPOSE 8000
 # Chạy bằng gunicorn (WSGI production) thay vì Flask dev server.
 # Dùng 1 worker + nhiều thread để tránh tranh chấp khoá ghi của SQLite.
 # Cổng lấy từ biến môi trường $PORT (Render/Railway đặt sẵn), mặc định 8000.
-CMD ["sh", "-c", "python seed_data.py && gunicorn app:app --bind 0.0.0.0:${PORT:-8000} --workers 1 --threads 4 --timeout 120"]
+CMD ["sh", "-c", "python seed_data.py --if-empty && gunicorn app:app --bind 0.0.0.0:${PORT:-8000} --workers 1 --threads 4 --timeout 120"]

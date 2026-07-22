@@ -2,6 +2,7 @@
 Route Giảng viên & Cổng chia sẻ nội dung — Nội dung 2 trong đề cương:
 chỉ tiêu 05 bài/giảng viên/đợt, cấp bậc, hiệu quả (lượt click).
 """
+from datetime import date, timedelta
 from flask import Blueprint, request, jsonify, g
 import database as db
 from auth import login_required
@@ -135,11 +136,12 @@ def my_stats():
     board = _leaderboard_rows(dot)
     me = next((item for item in board if item["id"] == user_id), None)
 
+    six_days_ago = (date.today() - timedelta(days=6)).isoformat()
     activity = db.query(
-        """SELECT date(thoi_gian) AS ngay, COUNT(*) AS so_luot FROM share_log
-           WHERE giang_vien_id = ? AND date(thoi_gian) >= date('now', '-6 days')
-           GROUP BY date(thoi_gian)""",
-        (user_id,),
+        f"""SELECT {db.date_col('thoi_gian')} AS ngay, COUNT(*) AS so_luot FROM share_log
+           WHERE giang_vien_id = ? AND {db.date_col('thoi_gian')} >= ?
+           GROUP BY {db.date_col('thoi_gian')}""",
+        (user_id, six_days_ago),
     )
 
     history = db.query(
@@ -158,7 +160,7 @@ def my_stats():
         (user_id,), fetchone=True,
     )
     share_days = db.query(
-        "SELECT DISTINCT date(thoi_gian) AS ngay FROM share_log WHERE giang_vien_id = ?",
+        f"SELECT DISTINCT {db.date_col('thoi_gian')} AS ngay FROM share_log WHERE giang_vien_id = ?",
         (user_id,),
     )
     nganh_row = db.query(

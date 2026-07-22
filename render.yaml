@@ -1,11 +1,13 @@
-# Render.com Blueprint — deploy backend tự động chỉ với 1 cú click.
+# Render.com Blueprint — deploy backend + PostgreSQL bền vững, tự động.
 # Cách dùng: đẩy repo lên GitHub -> Render Dashboard -> New -> Blueprint -> chọn repo.
+# Render đọc file này, tạo web service + 1 database PostgreSQL, tự nối DATABASE_URL.
 #
-# Lưu ý gói FREE: không hỗ trợ ổ đĩa bền vững (disk). Không sao — startCommand chạy
-# seed_data.py mỗi lần khởi động nên dữ liệu mẫu luôn được tạo lại đầy đủ. SQLite ghi
-# vào /tmp (ghi được trên máy chủ). Dữ liệu phát sinh trong phiên (lead mới, bài mới...)
-# sẽ reset khi server ngủ/khởi động lại — chấp nhận được cho demo. Cần lưu vĩnh viễn thì
-# nâng gói có disk hoặc chuyển sang Postgres.
+# Vì sao Postgres: dữ liệu (tài khoản mới, đổi vai trò, bài đã duyệt, lead...) được LƯU
+# BỀN VỮNG, không bị reset khi server ngủ/khởi động lại như SQLite trên /tmp trước đây.
+databases:
+  - name: dtu-db
+    plan: free
+
 services:
   - type: web
     name: dtu-backend
@@ -14,16 +16,18 @@ services:
     autoDeploy: true          # tự động deploy lại mỗi khi push lên nhánh main
     rootDir: backend
     buildCommand: pip install -r requirements.txt
-    # Nạp dữ liệu mẫu rồi chạy gunicorn (WSGI production). 1 worker để tránh khoá ghi SQLite.
-    startCommand: python seed_data.py && gunicorn app:app --bind 0.0.0.0:$PORT --workers 1 --threads 4 --timeout 120
+    # Seed CHỈ khi CSDL trống (lần đầu) rồi chạy gunicorn — các lần restart sau giữ nguyên dữ liệu.
+    startCommand: python seed_data.py --if-empty && gunicorn app:app --bind 0.0.0.0:$PORT --workers 1 --threads 4 --timeout 120
     healthCheckPath: /api/health
     envVars:
       - key: PYTHON_VERSION
         value: "3.12.6"
       - key: SECRET_KEY          # Render tự sinh chuỗi ngẫu nhiên an toàn
         generateValue: true
-      - key: DATABASE_PATH       # thư mục tạm ghi được (gói free không có disk bền vững)
-        value: /tmp/dtu_platform.db
+      - key: DATABASE_URL        # tự nối tới database Postgres bên dưới
+        fromDatabase:
+          name: dtu-db
+          property: connectionString
       - key: CORS_ALLOWED_ORIGINS
         value: "*"               # có thể siết lại thành URL frontend sau khi deploy
       - key: ANTHROPIC_API_KEY   # để trống vẫn chạy (chế độ AI offline); điền để dùng Claude thật

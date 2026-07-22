@@ -35,7 +35,7 @@ git push -u origin main
    - Start: `python seed_data.py && gunicorn app:app ...` (WSGI production)
    - `SECRET_KEY` tự sinh, health check `/api/health`, SQLite ghi vào `/tmp`
 
-> **Gói Free không có ổ đĩa bền vững** — không sao: `seed_data.py` chạy lại mỗi lần khởi động nên dữ liệu mẫu luôn đầy đủ. Dữ liệu phát sinh trong phiên (lead mới, bài mới...) sẽ reset khi server ngủ/khởi động lại. Cần lưu vĩnh viễn thì nâng gói có disk hoặc chuyển Postgres.
+> **Dữ liệu bền vững:** `render.yaml` đã khai báo sẵn một **PostgreSQL free** (`dtu-db`) và tự nối vào backend qua `DATABASE_URL`. Nhờ đó tài khoản mới, đổi vai trò, bài đã duyệt, lead... được **lưu vĩnh viễn**, không reset khi server ngủ. Khi push thay đổi có thêm database, vào Render → Blueprint của bạn → **Approve/Sync** để Render tạo Postgres và nối vào (hoặc tạo Postgres thủ công rồi thêm biến `DATABASE_URL` = *Internal Database URL* vào service).
 3. (Tùy chọn) Điền `ANTHROPIC_API_KEY` trong tab **Environment** để chatbot/soạn caption dùng Claude thật. Bỏ trống vẫn chạy đầy đủ ở chế độ AI offline.
 4. Bấm **Apply** → Render build & deploy, trả về URL dạng `https://dtu-backend.onrender.com`.
 5. Kiểm tra: mở `https://dtu-backend.onrender.com/api/health` — phải thấy `{"status":"ok"}`.

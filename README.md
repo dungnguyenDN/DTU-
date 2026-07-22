@@ -136,6 +136,15 @@ Nút **"Tạo gợi ý nội dung từ chủ đề này"** ở tab Chatbot gọi
 **tạo thật một dòng mới trong bảng `lich_noi_dung`** — đây chính là vòng phản hồi khép kín được nêu
 trong đề cương nghiên cứu, nay là code thật chứ không chỉ mô tả.
 
+## Cơ sở dữ liệu: SQLite (local) ↔ PostgreSQL (production)
+
+Tầng dữ liệu ([backend/database.py](backend/database.py)) tự chọn theo môi trường:
+
+- **Không có biến `DATABASE_URL`** → dùng **SQLite** (file cục bộ) — cho phát triển local và 56 kiểm thử, chạy offline không cần cài thêm.
+- **Có `DATABASE_URL`** (Render cấp) → dùng **PostgreSQL** — dữ liệu **bền vững thật sự**: tài khoản mới, đổi vai trò, bài đã duyệt, lead... không bị mất khi server khởi động lại.
+
+Cùng một API (`db.query` / `db.execute`), SQL viết bằng `?` (tự đổi sang `%s` cho Postgres); các hàm ngày (`date(...)`, chênh lệch ngày) được trừu tượng hóa để chạy đúng trên cả hai. Khi chạy Postgres, `seed_data.py --if-empty` chỉ tạo dữ liệu mẫu ở lần đầu (CSDL trống) nên các lần restart sau **giữ nguyên** dữ liệu người dùng nhập.
+
 ## Cấu hình nâng cao
 
 Sao chép `backend/.env.example` thành `backend/.env` và điền:

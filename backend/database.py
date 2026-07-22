@@ -1,13 +1,26 @@
 """
-Lớp truy cập dữ liệu — dùng sqlite3 (thư viện chuẩn của Python, không cần cài thêm).
-Thiết kế theo đúng 6 thực thể trong đề cương nghiên cứu:
-LichNoiDung, GiangVien, ShareLog, KpiDashboard, FAQ, ChatLog
+Lớp truy cập dữ liệu — hỗ trợ CẢ HAI cơ sở dữ liệu, tự chọn theo môi trường:
+
+  • Có biến môi trường DATABASE_URL (Render PostgreSQL) -> dùng PostgreSQL (dữ liệu BỀN VỮNG).
+  • Không có -> dùng SQLite (local dev + 56 kiểm thử, chạy offline không cần cài thêm).
+
+API công khai (query / execute / init_db / row_to_dict / rows_to_list) giữ NGUYÊN để các
+route không phải sửa. SQL viết bằng placeholder '?'; ở chế độ Postgres sẽ tự đổi sang '%s'.
 """
-import sqlite3
 import os
 from config import Config
 
-SCHEMA = """
+DATABASE_URL = os.environ.get("DATABASE_URL", "").strip()
+IS_POSTGRES = DATABASE_URL.startswith("postgres")
+
+if IS_POSTGRES:
+    import psycopg2
+    import psycopg2.extras
+else:
+    import sqlite3
+
+# ---- Schema (viết theo SQLite, tự chuyển kiểu cho Postgres) ----
+_SCHEMA_SQLITE = """
 CREATE TABLE IF NOT EXISTS giang_vien (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     ma_giang_vien TEXT UNIQUE NOT NULL,
@@ -100,8 +113,36 @@ CREATE TABLE IF NOT EXISTS funnel_source (
 );
 """
 
+if IS_POSTGRES:
+    SCHEMA = (
+        _SCHEMA_SQLITE
+        .replace("INTEGER PRIMARY KEY AUTOINCREMENT", "SERIAL PRIMARY KEY")
+        .replace("TEXT DEFAULT CURRENT_TIMESTAMP", "TEXT DEFAULT (to_char(now(), 'YYYY-MM-DD HH24:MI:SS'))")
+    )
+else:
+    SCHEMA = _SCHEMA_SQLITE
 
+
+# ---- Helper biểu thức ngày (khác cú pháp giữa SQLite và Postgres) ----
+def date_col(col):
+    """Trả về biểu thức lấy phần NGÀY (chuỗi 'YYYY-MM-DD') từ một cột thời gian."""
+    return f"({col}::date)::text" if IS_POSTGRES else f"date({col})"
+
+
+def abs_day_diff_sql(col):
+    """Biểu thức |số ngày lệch| giữa cột và 1 tham số '?' (để tìm bài gần ngày nhất)."""
+    return f"ABS(({col})::date - (?)::date)" if IS_POSTGRES else f"ABS(julianday({col}) - julianday(?))"
+
+
+def _q(sql):
+    """Đổi placeholder '?' -> '%s' khi chạy Postgres (SQL trong dự án không có '?' trong literal)."""
+    return sql.replace("?", "%s") if IS_POSTGRES else sql
+
+
+# ---- Kết nối & thao tác ----
 def get_connection():
+    if IS_POSTGRES:
+        return psycopg2.connect(DATABASE_URL)
     os.makedirs(os.path.dirname(Config.DATABASE_PATH), exist_ok=True)
     conn = sqlite3.connect(Config.DATABASE_PATH)
     conn.row_factory = sqlite3.Row
@@ -111,22 +152,32 @@ def get_connection():
 
 def init_db():
     conn = get_connection()
-    conn.executescript(SCHEMA)
-    # Migration an toàn cho CSDL cũ đã tạo trước khi có cột kich_hoat.
     try:
-        conn.execute("ALTER TABLE giang_vien ADD COLUMN kich_hoat INTEGER NOT NULL DEFAULT 1")
-    except sqlite3.OperationalError:
-        pass  # cột đã tồn tại
-    conn.commit()
-    conn.close()
+        if IS_POSTGRES:
+            cur = conn.cursor()
+            cur.execute(SCHEMA)  # psycopg2 chạy được nhiều câu lệnh ngăn cách bằng ';'
+            cur.execute("ALTER TABLE giang_vien ADD COLUMN IF NOT EXISTS kich_hoat INTEGER NOT NULL DEFAULT 1")
+            conn.commit()
+        else:
+            conn.executescript(SCHEMA)
+            try:
+                conn.execute("ALTER TABLE giang_vien ADD COLUMN kich_hoat INTEGER NOT NULL DEFAULT 1")
+            except sqlite3.OperationalError:
+                pass  # cột đã tồn tại
+            conn.commit()
+    finally:
+        conn.close()
 
 
 def query(sql, params=(), fetchone=False):
     conn = get_connection()
     try:
-        cur = conn.execute(sql, params)
-        rows = cur.fetchone() if fetchone else cur.fetchall()
-        return rows
+        if IS_POSTGRES:
+            cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+            cur.execute(_q(sql), params)
+        else:
+            cur = conn.execute(sql, params)
+        return cur.fetchone() if fetchone else cur.fetchall()
     finally:
         conn.close()
 
@@ -134,9 +185,20 @@ def query(sql, params=(), fetchone=False):
 def execute(sql, params=()):
     conn = get_connection()
     try:
-        cur = conn.execute(sql, params)
-        conn.commit()
-        return cur.lastrowid
+        if IS_POSTGRES:
+            cur = conn.cursor()
+            is_insert = sql.lstrip().upper().startswith("INSERT")
+            sql2 = _q(sql)
+            if is_insert and "RETURNING" not in sql.upper():
+                sql2 = sql2.rstrip().rstrip(";") + " RETURNING id"
+            cur.execute(sql2, params)
+            new_id = cur.fetchone()[0] if is_insert else None
+            conn.commit()
+            return new_id
+        else:
+            cur = conn.execute(sql, params)
+            conn.commit()
+            return cur.lastrowid
     finally:
         conn.close()
 

@@ -4,6 +4,7 @@ Chạy: python seed_data.py
 """
 import sys
 import os
+from datetime import date
 sys.path.insert(0, os.path.dirname(__file__))
 
 import database as db
@@ -13,12 +14,10 @@ TODAY_OFFSET_DAYS = 0  # có thể chỉnh để dữ liệu luôn "gần đây"
 
 
 def clear_all():
-    conn = db.get_connection()
+    # Xóa theo thứ tự an toàn khóa ngoại (bảng con trước, bảng cha sau).
     for table in ["share_log", "kpi_dashboard", "chat_log", "funnel_source",
                   "benchmark_truong", "faq", "lich_noi_dung", "giang_vien", "lead_tu_van"]:
-        conn.execute(f"DELETE FROM {table}")
-    conn.commit()
-    conn.close()
+        db.execute(f"DELETE FROM {table}")
 
 
 def seed():
@@ -142,8 +141,8 @@ def seed():
         ty_le = round(luot_tuong_tac / luot_xem * 100, 2)
         db.execute(
             """INSERT INTO kpi_dashboard (lich_noi_dung_id, ngay, nganh, luot_xem, luot_tuong_tac, luot_click, ty_le_tuong_tac)
-               VALUES (?, date('now'), ?, ?, ?, ?, ?)""",
-            (cid, nganh, luot_xem, luot_tuong_tac, luot_click, ty_le),
+               VALUES (?, ?, ?, ?, ?, ?, ?)""",
+            (cid, date.today().isoformat(), nganh, luot_xem, luot_tuong_tac, luot_click, ty_le),
         )
 
     # ===== Share log (giảng viên đã chia sẻ) =====
@@ -297,5 +296,25 @@ def seed():
     print(f"   Dang nhap demo: truyenthong@duytan.edu.vn / {default_password}  (vai tro: quan ly)")
 
 
-if __name__ == "__main__":
+def seed_if_empty():
+    """
+    Chỉ tạo dữ liệu mẫu khi CSDL đang trống (bảng giang_vien chưa có ai).
+    Dùng cho production Postgres: seed đúng MỘT lần ở lần khởi động đầu, các lần sau
+    giữ nguyên dữ liệu người dùng nhập (không bị xóa mỗi lần restart).
+    """
+    db.init_db()
+    row = db.query("SELECT COUNT(*) AS c FROM giang_vien", fetchone=True)
+    count = row["c"] if row else 0
+    if count and int(count) > 0:
+        print(f"CSDL da co {count} nguoi dung - bo qua seed (giu du lieu hien co).")
+        return
     seed()
+
+
+if __name__ == "__main__":
+    # `python seed_data.py`            -> tạo lại toàn bộ (xóa sạch rồi seed) — dùng khi reset local
+    # `python seed_data.py --if-empty` -> chỉ seed khi CSDL trống — dùng cho production (giữ dữ liệu)
+    if "--if-empty" in sys.argv:
+        seed_if_empty()
+    else:
+        seed()
